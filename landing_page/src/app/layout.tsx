@@ -14,9 +14,9 @@ export const metadata: Metadata = {
     title: ` 5K Bible Study - Empowering Your Faith Journey`,
     description: "ሕይወት ለዋጩ ፤ የእግዚአብሔር ቃል ይጠና ፤ በታማኝነትም ይታወጅ !",
     icons: {
-        icon: "/eyohalogo.png", // Standard favicon
-        shortcut: "/eyohalogo.png", // Alternative for older browsers
-        apple: "/eyohalogo.png", // For iOS home screen bookmarks
+        icon: "/fellow_logo.png", // Standard favicon
+        shortcut: "/fellow_logo.png", // Alternative for older browsers
+        apple: "/fellow_logo.png", // For iOS home screen bookmarks
     },
 };
 

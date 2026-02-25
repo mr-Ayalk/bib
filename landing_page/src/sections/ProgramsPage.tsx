@@ -8,7 +8,7 @@ import {
     Users,
     Star,
     GraduationCap,
-    Calendar,
+  
 } from "lucide-react";
 import Tag from "@/components/Tag";
 
