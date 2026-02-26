@@ -3,7 +3,7 @@ import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Tag from "@/components/Tag";
-import aboutImage from "../assets/images/abt.jpg";
+import aboutImage from "../assets/images/abtus.png";
 import { Users, Target } from "lucide-react";
 
 const AboutSection: React.FC = () => {

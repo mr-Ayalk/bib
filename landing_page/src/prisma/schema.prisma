@@ -1,0 +1,49 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+model Member {
+  id                String   @id @default(cuid())
+  firstName         String
+  lastName          String
+  username          String   @unique
+  password          String   // In a real app, hash this!
+  email             String   @unique
+  birthDayMonth     String   // e.g., "October 12"
+  image             String?  // URL to image
+  department        String
+  favoriteVerse     String
+  role              Role     @default(USER)
+  gender            Gender
+  batch             String   // Year of study
+  subCircleNumber   Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  attendances       Attendance[]
+}
+
+model Attendance {
+  id        String   @id @default(cuid())
+  date      DateTime @default(now())
+  status    String   // "Present", "Absent", "Permission"
+  member    Member   @relation(fields: [memberId], references: [id])
+  memberId  String
+}
