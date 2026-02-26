@@ -86,18 +86,25 @@ export default function Navbar({
                         href="/"
                         className="flex items-center space-x-3 cursor-pointer group"
                     >
-                        <Image
-                            src={logoImage}
-                            alt="Logo"
-                            width={45}
-                            height={45}
-                            className="object-contain transform group-hover:scale-105 transition-transform rounded-full"
-                        />
-                        <span
-                            className={`text-xl font-bold tracking-tight ${textColor}`}
-                        >
-                            5K BS Team
-                        </span>
+                        <div className="flex items-center gap-3">
+                            <div className="relative w-12 h-12">
+                                <Image
+                                    src={logoImage}
+                                    alt="5K Logo"
+                                    fill
+                                    className="rounded-full object-cover border border-slate-100 shadow-sm"
+                                />
+                            </div>
+                            <div>
+                                {/* Changed text-[#4C0B81] to include dark:text-white or a lighter purple */}
+                                <h1 className="text-[#4C0B81] dark:text-purple-400 font-black text-lg leading-tight uppercase tracking-tight">
+                                    5K Bible Study
+                                </h1>
+                                <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+                                    Addis Ababa University Fellowship
+                                </p>
+                            </div>
+                        </div>
                     </Link>
 
                     {/* 2. Desktop Navigation */}

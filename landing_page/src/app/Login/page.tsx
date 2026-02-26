@@ -19,22 +19,49 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
 
     // --- Authentication Logic ---
+    // const handleLogin = async (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     setError("");
+    //     setIsLoading(true);
+
+    //     // Mimicking a small delay for realism
+    //     setTimeout(() => {
+    //         if (username === "Admin" && password === "1234") {
+    //             router.push("/dashboard");
+    //         } else {
+    //             setError("Invalid username or password. Please try again.");
+    //             setIsLoading(false);
+    //         }
+    //     }, 800);
+    // };
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
         setIsLoading(true);
 
-        // Mimicking a small delay for realism
-        setTimeout(() => {
-            if (username === "Admin" && password === "1234") {
-                router.push("/dashboard");
-            } else {
-                setError("Invalid username or password. Please try again.");
-                setIsLoading(false);
-            }
-        }, 800);
-    };
+        try {
+            const res = await fetch("/api/login", {
+                method: "POST",
+                body: JSON.stringify({ username, password }),
+            });
+            const data = await res.json();
 
+            if (res.ok) {
+                // Check role and redirect
+                if (data.role === "ADMIN") {
+                    router.push("/admin-dashboard");
+                } else {
+                    router.push("/dashboard");
+                }
+            } else {
+                setError(data.error);
+            }
+        } catch (err) {
+            setError("Something went wrong. Check your connection.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-purple-100">
             {/* --- Header (AAU Inspired) --- */}
