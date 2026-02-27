@@ -17,42 +17,42 @@ const serviceData = [
         description:
             "An intensive, distraction-free 3-week immersion into a specific biblical book. Join 100-150 students in deep exegesis every semester.",
         thumbnailImage: socialmedia,
-        linkUrl: "#",
+        linkUrl: "/Programs",
     },
     {
         title: "Scripture Day",
         description:
             "Explore the journey of the Word from ancient scrolls to your hands. A yearly deep-dive into canonization and biblical history.",
         thumbnailImage: contentcreation,
-        linkUrl: "#",
+        linkUrl: "/Programs",
     },
     {
         title: "Friday Regular BS",
         description:
             "Our core weekly gathering. A systematic, book-by-book study designed to build a lifelong foundation in Truth every Friday.",
         thumbnailImage: seo,
-        linkUrl: "#",
+        linkUrl: "/Programs",
     },
     {
         title: "Special Programs",
         description:
             "Building community through Semester Dinners, Freshers Welcomes, and Graduate Send-offs. Faith is meant to be shared.",
         thumbnailImage: paidAd,
-        linkUrl: "#",
+        linkUrl: "/Programs",
     },
     {
         title: "Recitation Program",
         description:
             "The art of hiding the Word in your heart. Weekly sessions focused on memorization and public proclamation of scripture.",
         thumbnailImage: branding,
-        linkUrl: "#",
+        linkUrl: "/Programs",
     },
     {
         title: "Game & Get-together",
         description:
             "Beyond the books—fostering deep relationships through organized get-togethers, team games, and community events.",
         thumbnailImage: webdesign,
-        linkUrl: "#",
+        linkUrl: "/Programs",
     },
 ];
 

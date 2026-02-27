@@ -1,11 +1,14 @@
 import AboutSection1 from "@/sections/AboutUs";
+import BSLeaders from "@/sections/bsleaders";
 import CtaBanner from "@/sections/CtaBanner";
 import CtaSection from "@/sections/CtaSection";
 import Faqs from "@/sections/Faqs";
 
 import Footer from "@/sections/Footer";
+import Gallery from "@/sections/gallary";
 import Hero from "@/sections/Hero";
 import MaterialsSection from "@/sections/MaterialsSection";
+import PortalPreview from "@/sections/PortalPreview";
 
 import ServicesSection from "@/sections/Services";
 import Testimonials from "@/sections/Testimonials";
@@ -24,8 +27,11 @@ export default function Home() {
             <MaterialsSection />
             <TournamentVictory />
             <CtaSection />
-
+            <BSLeaders />
+            <Gallery />
+            <PortalPreview />
             <Testimonials />
+
             <Faqs />
             <Footer />
         </div>
