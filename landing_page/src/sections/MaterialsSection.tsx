@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 import Tag from "@/components/Tag"; // Ensure the path is correct
 
 const mainArticle = {
-    title: "The Pursuit of Holiness",
+    title: "ቅድስና፦ ከእግዚአብሔር፣ በእግዚአብሔር፣ ለእግዚአብሔር",
     description:
         "An in-depth exploration by the 5K Bible Study team on living a set-apart life in a modern world. This article dives into biblical sanctification.",
     date: "Oct 24, 2025",
