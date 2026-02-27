@@ -11,6 +11,12 @@ import bibleLogo from "../assets/images/weekly.png";
 import secondImage from "../assets/images/bs_banner.png";
 import thirdImage from "../assets/images/manuscript.png";
 
+import sis from "../assets/images/SisayTadewos.jpg";
+import seme from "../assets/images/semalign_mark.jpg";
+import bemni from "../assets/images/Beimnet-Abdi.jpg";
+import mase from "../assets/images/Masamo-Mathewos.jpg";
+import fenu from "../assets/images/Beimnet-Abdi.jpg";
+import teme from "../assets/images/TEMESGEN-TAMIRAT.jpg";
 const SLIDES = [
     {
         id: 1,
@@ -170,19 +176,38 @@ export default function Hero() {
                                     className="flex items-center gap-4"
                                 >
                                     <div className="flex -space-x-3">
-                                        {[1, 2, 3, 4].map((i) => (
-                                            <div
-                                                key={i}
-                                                className="w-10 h-10 rounded-full border-2 border-[#4C0B81] bg-slate-200"
-                                            />
-                                        ))}
+                                        {/* 4. Social Proof / Student Avatars */}
+                                        <motion.div
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ delay: 0.5 }}
+                                            className="flex items-center gap-4"
+                                        >
+                                            <div className="flex -space-x-3">
+                                                {[sis, mase, bemni, teme].map(
+                                                    (url, i) => (
+                                                        <div
+                                                            key={i}
+                                                            className="relative w-10 h-10 rounded-full border-2 border-[#4C0B81] overflow-hidden bg-slate-200"
+                                                        >
+                                                            <Image
+                                                                src={url}
+                                                                alt={`Student ${i + 1}`}
+                                                                fill
+                                                                className="object-cover"
+                                                            />
+                                                        </div>
+                                                    ),
+                                                )}
+                                            </div>
+                                            <p className="text-sm font-semibold text-purple-200/70">
+                                                <span className="text-white font-bold">
+                                                    70+
+                                                </span>{" "}
+                                                Students enrolled this semester
+                                            </p>
+                                        </motion.div>
                                     </div>
-                                    <p className="text-sm font-semibold text-purple-200/70">
-                                        <span className="text-white font-bold">
-                                            70+
-                                        </span>{" "}
-                                        Students enrolled this semester
-                                    </p>
                                 </motion.div>
                             </div>
                         </div>

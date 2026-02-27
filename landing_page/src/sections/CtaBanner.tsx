@@ -36,9 +36,9 @@ const CtaBanner: React.FC = () => {
                         </div>
 
                         <div className="flex flex-col items-center md:items-end gap-4">
-                            <Link href="/Join" passHref>
+                            <Link href="/Contact" passHref>
                                 <button className="group relative inline-flex items-center justify-center px-10 py-4 bg-white text-[#6A0DAD] dark:bg-[#6A0DAD] dark:text-white text-base font-black rounded-xl transition-all duration-500 hover:shadow-lg hover:scale-[1.02] active:scale-95 whitespace-nowrap">
-                                    Join Us Now
+                                    Contact Us Now
                                     <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                 </button>
                             </Link>
