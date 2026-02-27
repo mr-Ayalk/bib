@@ -208,7 +208,7 @@ export default function LoginPage() {
                                             onChange={(e) =>
                                                 setUsername(e.target.value)
                                             }
-                                            placeholder="e.g. Admin"
+                                            placeholder="e.g. Tebe"
                                             className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-purple-500/10 focus:border-[#4C0B81] outline-none transition-all font-medium text-slate-700"
                                         />
                                     </div>

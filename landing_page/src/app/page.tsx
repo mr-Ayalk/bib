@@ -1,7 +1,6 @@
 import AboutSection1 from "@/sections/AboutUs";
 import BSLeaders from "@/sections/bsleaders";
 import CtaBanner from "@/sections/CtaBanner";
-import CtaSection from "@/sections/CtaSection";
 import Faqs from "@/sections/Faqs";
 
 import Footer from "@/sections/Footer";

@@ -5,17 +5,20 @@ import { motion } from "framer-motion";
 import { ExternalLink, Camera } from "lucide-react";
 
 // Replace these with your actual local image paths
-import img1 from "../assets/images/bs_banner.png";
-import img2 from "../assets/images/leaders1.png";
-import img3 from "../assets/images/leaders3.png";
+import img1 from "../assets/images/capture6.png";
+import img2 from "../assets/images/capture1.png";
+import img3 from "../assets/images/capture2.png";
+import img4 from "../assets/images/bs_banner.png";
+import img5 from "../assets/images/capture4.png";
+import img6 from "../assets/images/capture5.png";
 // Reuse or add more unique images for the 6-row look
 const galleryImages = [
     { id: 1, src: img1, alt: "Fellowship Gathering" },
     { id: 2, src: img2, alt: "Leaders Session" },
     { id: 3, src: img3, alt: "Community Study" },
-    { id: 4, src: img1, alt: "Worship Moment" },
-    { id: 5, src: img2, alt: "Group Discussion" },
-    { id: 6, src: img3, alt: "Campus Outreach" },
+    { id: 4, src: img4, alt: "Worship Moment" },
+    { id: 5, src: img5, alt: "Group Discussion" },
+    { id: 6, src: img6, alt: "Campus Outreach" },
 ];
 
 export default function Gallery() {
@@ -38,7 +41,7 @@ export default function Gallery() {
                     </div>
 
                     <motion.a
-                        href="https://t.me/+ouPuFGAGna80YjVk"
+                        href="https://t.me/ruthmanuscript2025"
                         target="_blank"
                         rel="noopener noreferrer"
                         whileHover={{ scale: 1.05 }}

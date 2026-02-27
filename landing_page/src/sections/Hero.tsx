@@ -12,10 +12,9 @@ import secondImage from "../assets/images/bs_banner.png";
 import thirdImage from "../assets/images/manuscript.png";
 
 import sis from "../assets/images/SisayTadewos.jpg";
-import seme from "../assets/images/semalign_mark.jpg";
 import bemni from "../assets/images/Beimnet-Abdi.jpg";
 import mase from "../assets/images/Masamo-Mathewos.jpg";
-import fenu from "../assets/images/Beimnet-Abdi.jpg";
+
 import teme from "../assets/images/TEMESGEN-TAMIRAT.jpg";
 const SLIDES = [
     {

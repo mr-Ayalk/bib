@@ -10,7 +10,6 @@ import {
     LogOut,
     UserPlus,
     Search,
-    GraduationCap,
     MoreVertical,
     TrendingUp,
 } from "lucide-react";

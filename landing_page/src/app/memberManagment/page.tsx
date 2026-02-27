@@ -1,6 +1,13 @@
 "use client";
-import React, { useState } from "react";
-import { X, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import React, { useState, useRef } from "react";
+import {
+    X,
+    Loader2,
+    CheckCircle2,
+    AlertCircle,
+    Camera,
+    User,
+} from "lucide-react";
 
 interface AddMemberModalProps {
     isOpen: boolean;
@@ -14,8 +21,30 @@ export default function AddMemberModal({
     const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
     const [errorMessage, setErrorMessage] = useState("");
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     if (!isOpen) return null;
+
+    // Handle Image Selection and conversion to Base64
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                // 2MB Limit check
+                setErrorMessage(
+                    "Image is too large. Please select a file under 2MB.",
+                );
+                setStatus("error");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -24,24 +53,31 @@ export default function AddMemberModal({
         setErrorMessage("");
 
         const formData = new FormData(e.currentTarget);
-        const data = Object.fromEntries(formData.entries());
+        const rawData = Object.fromEntries(formData.entries());
+
+        // Prepare the final payload
+        const payload = {
+            ...rawData,
+            subCircleNumber: Number(rawData.subCircleNumber),
+            photo: imagePreview, // This will be the Base64 string
+        };
 
         try {
             const res = await fetch("/api/members", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+                body: JSON.stringify(payload),
             });
 
             const result = await res.json();
 
             if (res.ok) {
                 setStatus("success");
-                // Close modal after 2 seconds on success
                 setTimeout(() => {
                     onClose();
                     setStatus("idle");
-                    window.location.reload(); // Refresh table data
+                    setImagePreview(null);
+                    window.location.reload();
                 }, 2000);
             } else {
                 setStatus("error");
@@ -57,9 +93,9 @@ export default function AddMemberModal({
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md transition-all">
-            <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 max-h-[90vh] overflow-y-auto">
                 {/* Header */}
-                <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 sticky top-0 z-10 backdrop-blur-sm">
                     <div>
                         <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase">
                             Register{" "}
@@ -102,13 +138,52 @@ export default function AddMemberModal({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             {/* Error Message */}
                             {status === "error" && (
-                                <div className="col-span-full bg-red-50 border border-red-100 p-4 rounded-2xl flex items-center gap-3 text-red-600 animate-shake">
+                                <div className="col-span-full bg-red-50 border border-red-100 p-4 rounded-2xl flex items-center gap-3 text-red-600">
                                     <AlertCircle size={20} />
                                     <span className="text-sm font-bold">
                                         {errorMessage}
                                     </span>
                                 </div>
                             )}
+
+                            {/* Image Upload Section */}
+                            <div className="col-span-full flex flex-col items-center mb-4">
+                                <div
+                                    onClick={() =>
+                                        fileInputRef.current?.click()
+                                    }
+                                    className="relative w-28 h-28 rounded-full border-4 border-slate-100 shadow-inner bg-slate-50 flex items-center justify-center cursor-pointer group overflow-hidden"
+                                >
+                                    {imagePreview ? (
+                                        <img
+                                            src={imagePreview}
+                                            alt="Preview"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <User
+                                            size={40}
+                                            className="text-slate-300 group-hover:text-[#4C0B81] transition-colors"
+                                        />
+                                    )}
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <Camera
+                                            className="text-white"
+                                            size={24}
+                                        />
+                                    </div>
+                                </div>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleImageChange}
+                                    accept="image/*"
+                                    className="hidden"
+                                />
+                                <p className="text-[10px] font-black text-slate-400 uppercase mt-2">
+                                    Upload Profile Photo
+                                </p>
+                            </div>
 
                             {/* Name Fields */}
                             <div className="space-y-1.5">
@@ -120,7 +195,7 @@ export default function AddMemberModal({
                                     name="firstName"
                                     required
                                     disabled={isLoading}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] focus:ring-4 focus:ring-purple-50 outline-none transition-all"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] outline-none"
                                 />
                             </div>
 
@@ -133,7 +208,7 @@ export default function AddMemberModal({
                                     name="lastName"
                                     required
                                     disabled={isLoading}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] focus:ring-4 focus:ring-purple-50 outline-none transition-all"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] outline-none"
                                 />
                             </div>
 
@@ -147,13 +222,13 @@ export default function AddMemberModal({
                                     name="email"
                                     required
                                     disabled={isLoading}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] focus:ring-4 focus:ring-purple-50 outline-none transition-all"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] outline-none"
                                 />
                             </div>
 
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
-                                    Birth Date (e.g. Oct 12)
+                                    Birth Date
                                 </label>
                                 <input
                                     type="text"
@@ -161,7 +236,7 @@ export default function AddMemberModal({
                                     placeholder="October 12"
                                     required
                                     disabled={isLoading}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] focus:ring-4 focus:ring-purple-50 outline-none transition-all"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] outline-none"
                                 />
                             </div>
 
@@ -175,7 +250,7 @@ export default function AddMemberModal({
                                     name="department"
                                     required
                                     disabled={isLoading}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] focus:ring-4 focus:ring-purple-50 outline-none transition-all"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] outline-none"
                                 />
                             </div>
 
@@ -217,7 +292,7 @@ export default function AddMemberModal({
                                     Gender
                                 </label>
                                 <div className="flex gap-3">
-                                    <label className="flex-1 flex items-center justify-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors has-[:checked]:border-[#4C0B81] has-[:checked]:bg-purple-50">
+                                    <label className="flex-1 flex items-center justify-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 has-[:checked]:border-[#4C0B81] has-[:checked]:bg-purple-50">
                                         <input
                                             type="radio"
                                             name="gender"
@@ -229,7 +304,7 @@ export default function AddMemberModal({
                                             Male
                                         </span>
                                     </label>
-                                    <label className="flex-1 flex items-center justify-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors has-[:checked]:border-[#4C0B81] has-[:checked]:bg-purple-50">
+                                    <label className="flex-1 flex items-center justify-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 has-[:checked]:border-[#4C0B81] has-[:checked]:bg-purple-50">
                                         <input
                                             type="radio"
                                             name="gender"
@@ -263,7 +338,7 @@ export default function AddMemberModal({
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full bg-[#4C0B81] text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-[#37085e] disabled:bg-slate-300 disabled:cursor-not-allowed transition-all shadow-xl shadow-purple-200 flex items-center justify-center gap-2"
+                                    className="w-full bg-[#4C0B81] text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-[#37085e] disabled:bg-slate-300 transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-100"
                                 >
                                     {isLoading ? (
                                         <>

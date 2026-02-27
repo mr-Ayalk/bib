@@ -11,7 +11,7 @@ interface Leader {
     image: string; // Add your asset paths here
 }
 
-const currentLeaders: Leader[] = Array(7).fill({
+const currentLeaders: Leader[] = Array(6).fill({
     name: "Leader Name",
     dept: "Software Engineering",
     role: "Chairperson",
@@ -66,7 +66,7 @@ const LeadershipSection = () => {
                     </h2>
                     <p className="text-slate-500 text-sm">Batch of 2025/26</p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6  gap-6 mb-24">
                     {currentLeaders.map((l, i) => (
                         <LeaderCard key={i} leader={l} />
                     ))}

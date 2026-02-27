@@ -1,9 +1,9 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
 
-const prisma = new PrismaClient();
-
-// GET: Fetch all members for the dashboard table
 export async function GET() {
     try {
         const members = await prisma.member.findMany({
@@ -18,49 +18,87 @@ export async function GET() {
     }
 }
 
-// POST: Register a new member
 export async function POST(request: Request) {
     try {
-        const body = await request.json();
+        const formData = await request.formData();
 
-        const {
-            firstName,
-            lastName,
-            email,
-            department,
-            batch,
-            gender,
-            subCircleNumber,
-            birthDayMonth,
-            favoriteVerse,
-        } = body;
+        // Extract text fields
+        const firstName = formData.get("firstName") as string;
+        const lastName = formData.get("lastName") as string;
+        const email = formData.get("email") as string;
+        const department = formData.get("department") as string;
+        const batch = formData.get("batch") as string;
+        const gender = formData.get("gender") as "MALE" | "FEMALE";
+        const subCircleNumber = formData.get("subCircleNumber") as string;
+        const birthDayMonth = formData.get("birthDayMonth") as string;
+        const favoriteVerse = formData.get("favoriteVerse") as string;
 
-        // Generate a unique username: firstname.lastname + random 3-digit number
+        // Extract the file
+        const imageFile = formData.get("image") as File | null;
+
+        // 1. Basic Validation
+        if (!firstName || !lastName || !email || !gender) {
+            return NextResponse.json(
+                { error: "Missing required fields" },
+                { status: 400 },
+            );
+        }
+
+        // 2. Handle File Upload (Saving to public/uploads)
+        let imageUrl = null;
+        if (imageFile && imageFile.size > 0) {
+            const buffer = Buffer.from(await imageFile.arrayBuffer());
+            const filename = `${Date.now()}-${imageFile.name.replace(/\s+/g, "-")}`;
+            const uploadDir = path.join(process.cwd(), "public", "uploads");
+
+            try {
+                // Ensure the directory exists
+                await mkdir(uploadDir, { recursive: true });
+                // Write the file
+                await writeFile(path.join(uploadDir, filename), buffer);
+                // The URL path we will store in the DB
+                imageUrl = `/uploads/${filename}`;
+            } catch (err) {
+                console.error("File Save Error:", err);
+                // Continue without image if save fails, or throw error
+            }
+        }
+
+        // 3. Generate a unique username
         const generatedUsername = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(100 + Math.random() * 900)}`;
 
+        // 4. Security: Hash the default password
+        const hashedPassword = await bcrypt.hash("changeme123", 10);
+
+        // 5. Save to Prisma (Using your exact schema field names)
         const newMember = await prisma.member.create({
             data: {
                 firstName,
                 lastName,
                 email,
                 username: generatedUsername,
-                password: "changeme123", // Default password for first login
+                password: hashedPassword,
                 department,
                 batch,
-                gender, // Must be "MALE" or "FEMALE" as per schema
-                subCircleNumber: parseInt(subCircleNumber),
+                gender: gender, // Matches Enum
+                subCircleNumber: parseInt(subCircleNumber) || 0,
                 birthDayMonth: birthDayMonth || "Not Provided",
                 favoriteVerse: favoriteVerse || "To be updated",
-                role: "USER", // Default role
+                image: imageUrl, // Storing the path string
+                role: "USER",
             },
         });
 
+        // Remove password from response for security
+        const { password: _, ...memberData } = newMember;
+
         return NextResponse.json(
-            { success: true, member: newMember },
+            { success: true, member: memberData },
             { status: 201 },
         );
     } catch (error: any) {
-        console.error("Create Error:", error);
+        console.error("Create Error Detail:", error);
+
         if (error.code === "P2002") {
             return NextResponse.json(
                 {
@@ -69,8 +107,9 @@ export async function POST(request: Request) {
                 { status: 400 },
             );
         }
+
         return NextResponse.json(
-            { error: "Internal Server Error" },
+            { error: "Internal Server Error: " + error.message },
             { status: 500 },
         );
     }

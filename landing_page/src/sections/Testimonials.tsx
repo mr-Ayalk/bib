@@ -6,32 +6,32 @@ import { Quote, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 import Tag from "@/components/Tag";
 
 // Image Imports
-import testimonial1 from "../assets/images/SisayTadewos.jpg";
-import testimonial2 from "../assets/images/semalign_mark.jpg";
-import testimonial3 from "../assets/images/Beimnet-Abdi.jpg";
-import testimonial4 from "../assets/images/Masamo-Mathewos.jpg";
+import testimonial1 from "../assets/images/tebe.png";
+import testimonial2 from "../assets/images/Olly.jpg";
+import testimonial3 from "../assets/images/ayalk.jpg";
+import testimonial4 from "../assets/images/beki.png";
 
 const testimonies = [
     {
-        name: "Semalign Mark",
+        name: "Olly D.",
         role: "TNT Trainee",
         image: testimonial2,
         text: "The TNT program didn't just teach me leadership; it showed me how to live the Word in my daily campus life. My perspective on service has shifted forever.",
     },
     {
-        name: "Beimnet Abdi",
+        name: "Ayalkbet T.",
         role: "Manuscript Member",
         image: testimonial3,
         text: "Studying the Bible through the Manuscript method opened my eyes. For the first time, I felt like I was hearing God's voice directly from the text.",
     },
     {
-        name: "Masamo Mathewos",
+        name: "Bereket G.",
         role: "Hermenutics Student",
         image: testimonial4,
         text: "I used to struggle with difficult passages. Now, I have the tools to interpret faithfully. This study has been a foundation for my spiritual growth.",
     },
     {
-        name: "Sisay T.",
+        name: "Tebarek F",
         role: "Bible Reading Challenge",
         image: testimonial1,
         text: "Consistency was my biggest challenge. Being part of this 5K community kept me accountable, and reading through the Word changed my heart.",
@@ -47,7 +47,9 @@ const Testimonials: React.FC = () => {
     }, []);
 
     const prev = () => {
-        setActiveIndex((prev) => (prev - 1 + testimonies.length) % testimonies.length);
+        setActiveIndex(
+            (prev) => (prev - 1 + testimonies.length) % testimonies.length,
+        );
     };
 
     // Auto-slide effect
@@ -70,12 +72,13 @@ const Testimonials: React.FC = () => {
                         Impact Stories
                     </Tag>
                     <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
-                        The <span className="text-[#6A0DAD]">Student</span> Experience
+                        The <span className="text-[#6A0DAD]">Student</span>{" "}
+                        Experience
                     </h2>
                 </div>
 
                 <div className="max-w-5xl mx-auto">
-                    <div 
+                    <div
                         className="relative min-h-[450px] md:min-h-[350px] flex items-center justify-center"
                         onMouseEnter={() => setIsPaused(true)}
                         onMouseLeave={() => setIsPaused(false)}
@@ -104,10 +107,14 @@ const Testimonials: React.FC = () => {
 
                                 {/* Content */}
                                 <div className="flex flex-col justify-center text-center md:text-left">
-                                    <Quote size={32} className="text-[#6A0DAD] opacity-20 mb-4 mx-auto md:mx-0" />
-                                    
+                                    <Quote
+                                        size={32}
+                                        className="text-[#6A0DAD] opacity-20 mb-4 mx-auto md:mx-0"
+                                    />
+
                                     <p className="text-lg md:text-xl font-medium text-slate-700 dark:text-slate-200 leading-snug mb-6 italic">
-                                        &ldquo;{testimonies[activeIndex].text}&rdquo;
+                                        &ldquo;{testimonies[activeIndex].text}
+                                        &rdquo;
                                     </p>
 
                                     <div>
@@ -124,24 +131,24 @@ const Testimonials: React.FC = () => {
 
                         {/* Controls */}
                         <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-30">
-                            <button 
+                            <button
                                 onClick={prev}
                                 className="p-3 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-full shadow-lg border border-slate-100 dark:border-white/10 hover:bg-[#6A0DAD] hover:text-white transition-all active:scale-90"
                             >
                                 <ChevronLeft size={20} />
                             </button>
-                            
+
                             <div className="flex gap-1.5 px-2">
                                 {testimonies.map((_, i) => (
                                     <button
                                         key={i}
                                         onClick={() => setActiveIndex(i)}
-                                        className={`h-1.5 transition-all duration-300 rounded-full ${i === activeIndex ? 'w-6 bg-[#6A0DAD]' : 'w-1.5 bg-slate-300 dark:bg-slate-700'}`}
+                                        className={`h-1.5 transition-all duration-300 rounded-full ${i === activeIndex ? "w-6 bg-[#6A0DAD]" : "w-1.5 bg-slate-300 dark:bg-slate-700"}`}
                                     />
                                 ))}
                             </div>
 
-                            <button 
+                            <button
                                 onClick={next}
                                 className="p-3 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-full shadow-lg border border-slate-100 dark:border-white/10 hover:bg-[#6A0DAD] hover:text-white transition-all active:scale-90"
                             >

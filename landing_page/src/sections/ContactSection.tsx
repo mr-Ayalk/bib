@@ -33,13 +33,8 @@ const ContactSection: React.FC = () => {
                             Get In <span className="text-[#6A0DAD]">Touch</span>
                         </h2>
                         <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-                            Have questions about our Bible study circles or want
-                            to partner with the
-                            <span className="text-orange-500 font-bold">
-                                {" "}
-                                Action/Evangelical Team
-                            </span>
-                            ? Reach out—we’d love to hear from you.
+                            Have questions about our Bible study circles ? Reach
+                            out—we’d love to hear from you.
                         </p>
 
                         <div className="space-y-6">
@@ -52,7 +47,7 @@ const ContactSection: React.FC = () => {
                                         Call Us
                                     </p>
                                     <p className="text-lg font-bold text-gray-900 dark:text-white">
-                                        +251 900 000 000
+                                        +251 95 379 2844
                                     </p>
                                 </div>
                             </div>
@@ -66,7 +61,7 @@ const ContactSection: React.FC = () => {
                                         Telegram
                                     </p>
                                     <p className="text-lg font-bold text-gray-900 dark:text-white">
-                                        @FiveK_BibleStudy
+                                        @5K_BibleStudy
                                     </p>
                                 </div>
                             </div>

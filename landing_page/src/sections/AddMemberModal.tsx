@@ -1,28 +1,60 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import {
-    X,
-    Loader2,
-    CheckCircle2,
-    AlertCircle,
-    Plus,
-    Search,
-    UserPlus,
-} from "lucide-react";
+import { X, Loader2, CheckCircle2, AlertCircle, Plus } from "lucide-react";
 
-// --- MODAL COMPONENT ---
+interface Member {
+    id?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    birthDayMonth?: string;
+    department?: string;
+    batch?: string;
+    subCircleNumber?: number;
+    gender?: string;
+    favoriteVerse?: string;
+    imageUrl?: string;
+}
+
 interface AddMemberModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess: () => void;
+    initialData: Member | null; // Null means "Add Mode", Object means "Edit Mode"
 }
 
-function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
+export default function AddMemberModal({
+    isOpen,
+    onClose,
+    onSuccess,
+    initialData,
+}: AddMemberModalProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
     const [errorMessage, setErrorMessage] = useState("");
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+    // Synchronize image preview with initialData
+    useEffect(() => {
+        if (isOpen) {
+            setImagePreview(initialData?.imageUrl || null);
+            setStatus("idle");
+            setErrorMessage("");
+        }
+    }, [isOpen, initialData]);
 
     if (!isOpen) return null;
+
+    const isEditMode = !!initialData?.id;
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => setImagePreview(reader.result as string);
+            reader.readAsDataURL(file);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -31,13 +63,17 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
         setErrorMessage("");
 
         const formData = new FormData(e.currentTarget);
-        const data = Object.fromEntries(formData.entries());
+
+        // Determine Endpoint and Method
+        const endpoint = isEditMode
+            ? `/api/members/${initialData.id}`
+            : "/api/members";
+        const method = isEditMode ? "PUT" : "POST";
 
         try {
-            const res = await fetch("/api/members", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+            const res = await fetch(endpoint, {
+                method: method,
+                body: formData,
             });
 
             const result = await res.json();
@@ -48,29 +84,31 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
                     onSuccess();
                     onClose();
                     setStatus("idle");
-                }, 2000);
+                    setImagePreview(null);
+                }, 1500);
             } else {
                 setStatus("error");
-                setErrorMessage(result.error || "Failed to save member");
+                setErrorMessage(
+                    result.error ||
+                        `Failed to ${isEditMode ? "update" : "save"} member`,
+                );
             }
         } catch (err) {
             setStatus("error");
-            setErrorMessage("Connection error. Please check your database.");
+            setErrorMessage("Connection error. Please check your server.");
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-            <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md overflow-y-auto">
+            <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl my-auto animate-in zoom-in duration-300">
                 <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                    <div>
-                        <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase">
-                            Register{" "}
-                            <span className="text-[#4C0B81]">New Member</span>
-                        </h2>
-                    </div>
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase">
+                        {isEditMode ? "Edit" : "Register"}{" "}
+                        <span className="text-[#4C0B81]">Member</span>
+                    </h2>
                     <button
                         onClick={onClose}
                         className="p-3 hover:bg-white rounded-2xl transition-all"
@@ -86,12 +124,42 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
                                 size={48}
                                 className="text-green-600"
                             />
-                            <h3 className="text-xl font-black">
-                                MEMBER REGISTERED!
+                            <h3 className="text-xl font-black uppercase">
+                                Member {isEditMode ? "Updated" : "Registered"}!
                             </h3>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            {/* IMAGE UPLOAD */}
+                            <div className="col-span-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 p-6 rounded-[2rem] bg-slate-50/50 hover:bg-slate-50 transition-colors">
+                                {imagePreview ? (
+                                    <img
+                                        src={imagePreview}
+                                        alt="Preview"
+                                        className="w-24 h-24 rounded-2xl object-cover mb-4 shadow-md"
+                                    />
+                                ) : (
+                                    <div className="w-24 h-24 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                                        <Plus className="text-slate-400" />
+                                    </div>
+                                )}
+                                <label className="cursor-pointer">
+                                    <span className="bg-[#4C0B81]/10 text-[#4C0B81] px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-[#4C0B81]/20 transition-all">
+                                        {isEditMode
+                                            ? "Change Photo"
+                                            : "Upload Photo"}
+                                    </span>
+                                    <input
+                                        type="file"
+                                        name="image"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={handleImageChange}
+                                        disabled={isLoading}
+                                    />
+                                </label>
+                            </div>
+
                             {status === "error" && (
                                 <div className="col-span-full bg-red-50 p-4 rounded-2xl flex items-center gap-3 text-red-600">
                                     <AlertCircle size={20} />
@@ -100,6 +168,8 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
                                     </span>
                                 </div>
                             )}
+
+                            {/* INPUT FIELDS - Using defaultValue for Edit Mode */}
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-slate-400 uppercase">
                                     First Name
@@ -109,9 +179,11 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
                                     name="firstName"
                                     required
                                     disabled={isLoading}
+                                    defaultValue={initialData?.firstName}
                                     className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] outline-none"
                                 />
                             </div>
+
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-slate-400 uppercase">
                                     Last Name
@@ -121,9 +193,11 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
                                     name="lastName"
                                     required
                                     disabled={isLoading}
+                                    defaultValue={initialData?.lastName}
                                     className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] outline-none"
                                 />
                             </div>
+
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-slate-400 uppercase">
                                     Email Address
@@ -133,9 +207,11 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
                                     name="email"
                                     required
                                     disabled={isLoading}
+                                    defaultValue={initialData?.email}
                                     className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] outline-none"
                                 />
                             </div>
+
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-slate-400 uppercase">
                                     Birth Date
@@ -146,9 +222,11 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
                                     placeholder="October 12"
                                     required
                                     disabled={isLoading}
+                                    defaultValue={initialData?.birthDayMonth}
                                     className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] outline-none"
                                 />
                             </div>
+
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-slate-400 uppercase">
                                     Department
@@ -158,9 +236,11 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
                                     name="department"
                                     required
                                     disabled={isLoading}
+                                    defaultValue={initialData?.department}
                                     className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] outline-none"
                                 />
                             </div>
+
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-slate-400 uppercase">
                                     Year Group
@@ -168,7 +248,10 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
                                 <select
                                     name="batch"
                                     disabled={isLoading}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white"
+                                    defaultValue={
+                                        initialData?.batch || "1st Year"
+                                    }
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white outline-none focus:border-[#4C0B81]"
                                 >
                                     <option value="1st Year">1st Year</option>
                                     <option value="2nd Year">2nd Year</option>
@@ -177,6 +260,7 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
                                     <option value="5th Year">5th Year</option>
                                 </select>
                             </div>
+
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-slate-400 uppercase">
                                     Sub-Circle (1-5)
@@ -188,9 +272,11 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
                                     max="5"
                                     required
                                     disabled={isLoading}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200"
+                                    defaultValue={initialData?.subCircleNumber}
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-[#4C0B81]"
                                 />
                             </div>
+
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-slate-400 uppercase">
                                     Gender
@@ -206,6 +292,9 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
                                                 name="gender"
                                                 value={g}
                                                 required
+                                                defaultChecked={
+                                                    initialData?.gender === g
+                                                }
                                                 className="accent-[#4C0B81]"
                                             />
                                             <span className="text-xs font-bold">
@@ -217,6 +306,7 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
                                     ))}
                                 </div>
                             </div>
+
                             <div className="col-span-full space-y-1.5">
                                 <label className="text-[10px] font-black text-slate-400 uppercase">
                                     Favorite Bible Verse
@@ -225,22 +315,26 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
                                     name="favoriteVerse"
                                     required
                                     disabled={isLoading}
+                                    defaultValue={initialData?.favoriteVerse}
                                     rows={2}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-[#4C0B81]"
                                     placeholder="e.g. John 3:16"
                                 />
                             </div>
+
                             <div className="col-span-full pt-4">
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full bg-[#4C0B81] text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-[#37085e] flex items-center justify-center gap-2"
+                                    className="w-full bg-[#4C0B81] text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-[#37085e] flex items-center justify-center gap-2 transition-all"
                                 >
                                     {isLoading ? (
                                         <Loader2
                                             className="animate-spin"
                                             size={20}
                                         />
+                                    ) : isEditMode ? (
+                                        "Update Member Details"
                                     ) : (
                                         "Save Member to Database"
                                     )}
@@ -250,143 +344,6 @@ function AddMemberModal({ isOpen, onClose, onSuccess }: AddMemberModalProps) {
                     )}
                 </form>
             </div>
-        </div>
-    );
-}
-
-// --- MAIN PAGE COMPONENT ---
-export default function MembersPage() {
-    const [members, setMembers] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-
-    const fetchMembers = async () => {
-        setIsLoading(true);
-        try {
-            const res = await fetch("/api/members");
-            const data = await res.json();
-            setMembers(data);
-        } catch (err) {
-            console.error("Failed to load members");
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchMembers();
-    }, []);
-
-    return (
-        <div className="p-10 space-y-8">
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-black text-slate-800 uppercase tracking-tighter">
-                        Member{" "}
-                        <span className="text-[#4C0B81]">Management</span>
-                    </h1>
-                    <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">
-                        Total Registered: {members.length}
-                    </p>
-                </div>
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="bg-[#4C0B81] text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:shadow-lg hover:shadow-purple-200 transition-all active:scale-95"
-                >
-                    <UserPlus size={20} />
-                    Add New Member
-                </button>
-            </header>
-
-            {/* Table Section */}
-            <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-slate-50 border-b border-slate-100">
-                            <tr>
-                                {[
-                                    "Name",
-                                    "ID/Username",
-                                    "Department",
-                                    "Year",
-                                    "Circle",
-                                    "Action",
-                                ].map((head) => (
-                                    <th
-                                        key={head}
-                                        className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest"
-                                    >
-                                        {head}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-50">
-                            {isLoading ? (
-                                <tr>
-                                    <td
-                                        colSpan={6}
-                                        className="p-20 text-center text-slate-400 font-bold uppercase tracking-widest"
-                                    >
-                                        Loading Records...
-                                    </td>
-                                </tr>
-                            ) : members.length === 0 ? (
-                                <tr>
-                                    <td
-                                        colSpan={6}
-                                        className="p-20 text-center text-slate-400 font-bold uppercase tracking-widest"
-                                    >
-                                        No members found
-                                    </td>
-                                </tr>
-                            ) : (
-                                members.map((member: any) => (
-                                    <tr
-                                        key={member.id}
-                                        className="hover:bg-slate-50/50 transition-colors"
-                                    >
-                                        <td className="px-6 py-4">
-                                            <div className="font-bold text-slate-800">
-                                                {member.firstName}{" "}
-                                                {member.lastName}
-                                            </div>
-                                            <div className="text-[10px] text-slate-400">
-                                                {member.email}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 font-mono text-xs text-purple-600">
-                                            {member.username}
-                                        </td>
-                                        <td className="px-6 py-4 text-sm font-medium text-slate-600">
-                                            {member.department}
-                                        </td>
-                                        <td className="px-6 py-4 text-sm font-medium text-slate-600">
-                                            {member.batch}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className="bg-purple-50 text-[#4C0B81] px-3 py-1 rounded-full text-[10px] font-black uppercase">
-                                                Circle {member.subCircleNumber}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <button className="text-xs font-bold text-slate-400 hover:text-[#4C0B81]">
-                                                Edit
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <AddMemberModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSuccess={fetchMembers}
-            />
         </div>
     );
 }

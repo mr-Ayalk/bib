@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import {
     GraduationCap,
@@ -10,95 +10,59 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { twMerge } from "tailwind-merge";
+
+// Keep your icon imports
 import Men from "../assets/images/Men_icon.png";
-
 import Women from "../assets/images/Women_icon.png";
-// Updated Data with Gender and Sub-Circle
 
-import sis from "../assets/images/SisayTadewos.jpg";
-import seme from "../assets/images/semalign_mark.jpg";
-import bemni from "../assets/images/Beimnet-Abdi.jpg";
-import mase from "../assets/images/Masamo-Mathewos.jpg";
-import fenu from "../assets/images/Beimnet-Abdi.jpg";
-import teme from "../assets/images/TEMESGEN-TAMIRAT.jpg";
-const memberData = {
-    "2nd Year": [
-        {
-            name: "Fenet Bekele",
-            dept: "Software Engineering",
-            gender: "F",
-            circle: 1,
-            photo: fenu,
-        },
-        {
-            name: "Beti Solomon",
-            dept: "Architecture",
-            gender: "F",
-            circle: 3,
-            photo: Women,
-        },
-    ],
-    "3rd Year": [
-        {
-            name: "Beimnet-Abdi",
-            dept: "Chemical Engineering",
-            gender: "F",
-            circle: 2,
-            photo: bemni,
-        },
-        {
-            name: "TEMESGEN TAMIRAT",
-            dept: "Statistics",
-            gender: "M",
-            circle: 3,
-            photo: teme,
-        },
-
-        {
-            name: "Martha Desta",
-            dept: "Mechanical Engineering",
-            gender: "F",
-            circle: 2,
-            photo: Women,
-        },
-    ],
-    "4th Year": [
-        {
-            name: "Masamo-Mathewos",
-            dept: "Mechanical Engineering",
-            gender: "M",
-            circle: 1,
-            photo: mase,
-        },
-        {
-            name: "Sisay Tadewos",
-            dept: "Software Engineering",
-            gender: "M",
-            circle: 3,
-            photo: sis,
-        },
-    ],
-    "5th Year": [
-        {
-            name: "Semalign Markos",
-            dept: "Electrical Engineering(Communication)",
-            gender: "M",
-            circle: 3,
-            photo: seme,
-        },
-
-        {
-            name: "Xolani Mamo",
-            dept: "IT Support",
-            gender: "M",
-            circle: 2,
-            photo: Men,
-        },
-    ],
-};
+interface Student {
+    firstName: string; // Changed from name
+    lastName: string; // Added
+    department: string; // Changed from dept
+    gender: "MALE" | "FEMALE"; // Match Prisma Enum
+    subCircleNumber: number; // Changed from circle
+    image?: string;
+    batch: string; // Changed from yearBatch
+}
 
 const Members: React.FC = () => {
     const [openYear, setOpenYear] = useState<string | null>("2nd Year");
+    const [memberData, setMemberData] = useState<Record<string, Student[]>>({});
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        const fetchMembers = async () => {
+            try {
+                const response = await fetch("/api/members");
+                const data: Student[] = await response.json();
+
+                // Use 'batch' instead of 'yearBatch'
+                const grouped = data.reduce(
+                    (acc: Record<string, Student[]>, student) => {
+                        const year = student.batch || "Unknown Batch";
+                        if (!acc[year]) acc[year] = [];
+                        acc[year].push(student);
+                        return acc;
+                    },
+                    {},
+                );
+
+                setMemberData(grouped);
+            } catch (error) {
+                console.error("Error fetching members:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchMembers();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center dark:bg-[#050505]">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#6A0DAD]"></div>
+            </div>
+        );
+    }
 
     return (
         <section className="py-24 bg-white dark:bg-[#050505] transition-colors duration-500 min-h-screen">
@@ -185,81 +149,77 @@ const Members: React.FC = () => {
                                             <div className="space-y-2">
                                                 {students
                                                     .sort((a, b) =>
-                                                        a.name.localeCompare(
-                                                            b.name,
+                                                        a.firstName.localeCompare(
+                                                            b.firstName,
                                                         ),
                                                     )
                                                     .map((student, idx) => (
                                                         <motion.div
                                                             key={idx}
-                                                            initial={{
-                                                                x: -20,
-                                                                opacity: 0,
-                                                            }}
-                                                            animate={{
-                                                                x: 0,
-                                                                opacity: 1,
-                                                            }}
-                                                            transition={{
-                                                                delay:
-                                                                    idx * 0.03,
-                                                            }}
+                                                            // ... keep your existing motion props
                                                             className="grid grid-cols-12 gap-4 p-4 rounded-xl bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-transparent hover:border-[#6A0DAD]/30 transition-all items-center group"
                                                         >
-                                                            {/* Number */}
                                                             <div className="col-span-1 font-black text-gray-400 group-hover:text-orange-500 transition-colors">
                                                                 {idx + 1}.
                                                             </div>
 
-                                                            {/* Name + Photo */}
                                                             <div className="col-span-4 flex items-center gap-3">
                                                                 <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-slate-200 dark:border-white/10 group-hover:border-[#6A0DAD] transition-all">
                                                                     <Image
                                                                         src={
-                                                                            student.photo
+                                                                            student.image || // Use the new field name
+                                                                            (student.gender ===
+                                                                            "MALE"
+                                                                                ? Men
+                                                                                : Women)
                                                                         }
-                                                                        alt={
-                                                                            student.name
-                                                                        }
+                                                                        alt={`${student.firstName} ${student.lastName}`}
                                                                         fill
+                                                                        sizes="40px" // Good practice for performance
                                                                         className="object-cover"
                                                                     />
                                                                 </div>
                                                                 <span className="font-bold text-gray-800 dark:text-gray-200 truncate">
+                                                                    {/* FIXED: Using firstName and lastName */}
                                                                     {
-                                                                        student.name
+                                                                        student.firstName
+                                                                    }{" "}
+                                                                    {
+                                                                        student.lastName
                                                                     }
                                                                 </span>
                                                             </div>
 
-                                                            {/* Dept */}
                                                             <div className="col-span-3 text-sm font-medium text-gray-600 dark:text-gray-400">
-                                                                {student.dept}
+                                                                {/* FIXED: Using department */}
+                                                                {
+                                                                    student.department
+                                                                }
                                                             </div>
 
-                                                            {/* Gender */}
                                                             <div className="col-span-2 text-center">
                                                                 <span
                                                                     className={twMerge(
                                                                         "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter",
+                                                                        /* FIXED: Matching "MALE" Enum */
                                                                         student.gender ===
-                                                                            "M"
+                                                                            "MALE"
                                                                             ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
                                                                             : "bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400",
                                                                     )}
                                                                 >
                                                                     {student.gender ===
-                                                                    "M"
+                                                                    "MALE"
                                                                         ? "Male"
                                                                         : "Female"}
                                                                 </span>
                                                             </div>
 
-                                                            {/* Sub-Circle */}
                                                             <div className="col-span-2 text-center">
                                                                 <span className="bg-slate-100 dark:bg-white/5 text-gray-800 dark:text-white px-4 py-1.5 rounded-lg font-black text-sm border border-gray-200 dark:border-white/10 group-hover:border-orange-500/50 transition-colors">
+                                                                    {/* FIXED: Using subCircleNumber */}
                                                                     {
-                                                                        student.circle
+                                                                        student.subCircleNumber
                                                                     }
                                                                 </span>
                                                             </div>
