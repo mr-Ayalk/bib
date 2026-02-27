@@ -26,7 +26,7 @@ export default function Home() {
 
             <MaterialsSection />
             <TournamentVictory />
-            <CtaSection />
+            {/* <CtaSection /> */}
             <BSLeaders />
             <Gallery />
             <PortalPreview />
