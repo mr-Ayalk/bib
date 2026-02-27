@@ -1,6 +1,13 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { X, Loader2, CheckCircle2, AlertCircle, Plus } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+    X,
+    Loader2,
+    CheckCircle2,
+    AlertCircle,
+    Camera,
+    User,
+} from "lucide-react";
 
 interface Member {
     id?: string;
@@ -20,7 +27,7 @@ interface AddMemberModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess: () => void;
-    initialData: Member | null; // Null means "Add Mode", Object means "Edit Mode"
+    initialData: Member | null; // Null = Add Mode, Object = Edit Mode
 }
 
 export default function AddMemberModal({
@@ -33,8 +40,11 @@ export default function AddMemberModal({
     const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
     const [errorMessage, setErrorMessage] = useState("");
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Synchronize image preview with initialData
+    const isEditMode = !!initialData?.id;
+
+    // Reset state when modal opens/closes
     useEffect(() => {
         if (isOpen) {
             setImagePreview(initialData?.imageUrl || null);
@@ -45,11 +55,14 @@ export default function AddMemberModal({
 
     if (!isOpen) return null;
 
-    const isEditMode = !!initialData?.id;
-
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                setErrorMessage("Image too large (Max 2MB)");
+                setStatus("error");
+                return;
+            }
             const reader = new FileReader();
             reader.onloadend = () => setImagePreview(reader.result as string);
             reader.readAsDataURL(file);
@@ -60,22 +73,15 @@ export default function AddMemberModal({
         e.preventDefault();
         setIsLoading(true);
         setStatus("idle");
-        setErrorMessage("");
 
         const formData = new FormData(e.currentTarget);
-
-        // Determine Endpoint and Method
         const endpoint = isEditMode
             ? `/api/members/${initialData.id}`
             : "/api/members";
         const method = isEditMode ? "PUT" : "POST";
 
         try {
-            const res = await fetch(endpoint, {
-                method: method,
-                body: formData,
-            });
-
+            const res = await fetch(endpoint, { method, body: formData });
             const result = await res.json();
 
             if (res.ok) {
@@ -83,20 +89,14 @@ export default function AddMemberModal({
                 setTimeout(() => {
                     onSuccess();
                     onClose();
-                    setStatus("idle");
-                    setImagePreview(null);
                 }, 1500);
             } else {
                 setStatus("error");
-                setErrorMessage(
-                    result.error ||
-                        `Failed to ${isEditMode ? "update" : "save"} member`,
-                );
+                setErrorMessage(result.error || "Something went wrong");
             }
         } catch {
-            // FIX: Removed (err) to satisfy the 'no-unused-vars' linter rule
             setStatus("error");
-            setErrorMessage("Connection error. Please check your database.");
+            setErrorMessage("Connection error. Check your database.");
         } finally {
             setIsLoading(false);
         }
@@ -105,6 +105,7 @@ export default function AddMemberModal({
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md overflow-y-auto">
             <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl my-auto animate-in zoom-in duration-300">
+                {/* Header */}
                 <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase">
                         {isEditMode ? "Edit" : "Register"}{" "}
@@ -126,43 +127,53 @@ export default function AddMemberModal({
                                 className="text-green-600"
                             />
                             <h3 className="text-xl font-black uppercase">
-                                Member {isEditMode ? "Updated" : "Registered"}!
+                                Member {isEditMode ? "Updated" : "Saved"}!
                             </h3>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            {/* IMAGE UPLOAD */}
-                            <div className="col-span-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 p-6 rounded-[2rem] bg-slate-50/50 hover:bg-slate-50 transition-colors">
-                                {imagePreview ? (
-                                    <img
-                                        src={imagePreview}
-                                        alt="Preview"
-                                        className="w-24 h-24 rounded-2xl object-cover mb-4 shadow-md"
-                                    />
-                                ) : (
-                                    <div className="w-24 h-24 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
-                                        <Plus className="text-slate-400" />
+                            {/* Image Section */}
+                            <div className="col-span-full flex flex-col items-center mb-4">
+                                <div
+                                    onClick={() =>
+                                        fileInputRef.current?.click()
+                                    }
+                                    className="relative w-24 h-24 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center cursor-pointer overflow-hidden group"
+                                >
+                                    {imagePreview ? (
+                                        <img
+                                            src={imagePreview}
+                                            alt="Preview"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <User
+                                            size={32}
+                                            className="text-slate-300"
+                                        />
+                                    )}
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                        <Camera
+                                            className="text-white"
+                                            size={20}
+                                        />
                                     </div>
-                                )}
-                                <label className="cursor-pointer">
-                                    <span className="bg-[#4C0B81]/10 text-[#4C0B81] px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-[#4C0B81]/20 transition-all">
-                                        {isEditMode
-                                            ? "Change Photo"
-                                            : "Upload Photo"}
-                                    </span>
-                                    <input
-                                        type="file"
-                                        name="image"
-                                        accept="image/*"
-                                        className="hidden"
-                                        onChange={handleImageChange}
-                                        disabled={isLoading}
-                                    />
-                                </label>
+                                </div>
+                                <input
+                                    type="file"
+                                    name="image"
+                                    ref={fileInputRef}
+                                    onChange={handleImageChange}
+                                    className="hidden"
+                                    accept="image/*"
+                                />
+                                <p className="text-[10px] font-black text-slate-400 uppercase mt-2">
+                                    Upload Photo
+                                </p>
                             </div>
 
                             {status === "error" && (
-                                <div className="col-span-full bg-red-50 p-4 rounded-2xl flex items-center gap-3 text-red-600">
+                                <div className="col-span-full bg-red-50 p-4 rounded-2xl flex items-center gap-3 text-red-600 border border-red-100">
                                     <AlertCircle size={20} />
                                     <span className="text-sm font-bold">
                                         {errorMessage}
@@ -170,164 +181,60 @@ export default function AddMemberModal({
                                 </div>
                             )}
 
-                            {/* INPUT FIELDS - Using defaultValue for Edit Mode */}
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase">
+                            {/* Form Fields */}
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
                                     First Name
                                 </label>
                                 <input
-                                    type="text"
                                     name="firstName"
-                                    required
-                                    disabled={isLoading}
                                     defaultValue={initialData?.firstName}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] outline-none"
+                                    required
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-[#4C0B81]"
                                 />
                             </div>
-
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
                                     Last Name
                                 </label>
                                 <input
-                                    type="text"
                                     name="lastName"
-                                    required
-                                    disabled={isLoading}
                                     defaultValue={initialData?.lastName}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] outline-none"
+                                    required
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-[#4C0B81]"
                                 />
                             </div>
-
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase">
-                                    Email Address
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
+                                    Email
                                 </label>
                                 <input
                                     type="email"
                                     name="email"
-                                    required
-                                    disabled={isLoading}
                                     defaultValue={initialData?.email}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] outline-none"
+                                    required
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-[#4C0B81]"
                                 />
                             </div>
-
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
                                     Birth Date
                                 </label>
                                 <input
-                                    type="text"
                                     name="birthDayMonth"
                                     placeholder="October 12"
-                                    required
-                                    disabled={isLoading}
                                     defaultValue={initialData?.birthDayMonth}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] outline-none"
-                                />
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase">
-                                    Department
-                                </label>
-                                <input
-                                    type="text"
-                                    name="department"
                                     required
-                                    disabled={isLoading}
-                                    defaultValue={initialData?.department}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4C0B81] outline-none"
-                                />
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase">
-                                    Year Group
-                                </label>
-                                <select
-                                    name="batch"
-                                    disabled={isLoading}
-                                    defaultValue={
-                                        initialData?.batch || "1st Year"
-                                    }
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white outline-none focus:border-[#4C0B81]"
-                                >
-                                    <option value="1st Year">1st Year</option>
-                                    <option value="2nd Year">2nd Year</option>
-                                    <option value="3rd Year">3rd Year</option>
-                                    <option value="4th Year">4th Year</option>
-                                    <option value="5th Year">5th Year</option>
-                                </select>
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase">
-                                    Sub-Circle (1-5)
-                                </label>
-                                <input
-                                    type="number"
-                                    name="subCircleNumber"
-                                    min="1"
-                                    max="5"
-                                    required
-                                    disabled={isLoading}
-                                    defaultValue={initialData?.subCircleNumber}
                                     className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-[#4C0B81]"
                                 />
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase">
-                                    Gender
-                                </label>
-                                <div className="flex gap-3">
-                                    {["MALE", "FEMALE"].map((g) => (
-                                        <label
-                                            key={g}
-                                            className="flex-1 flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer hover:bg-slate-50"
-                                        >
-                                            <input
-                                                type="radio"
-                                                name="gender"
-                                                value={g}
-                                                required
-                                                defaultChecked={
-                                                    initialData?.gender === g
-                                                }
-                                                className="accent-[#4C0B81]"
-                                            />
-                                            <span className="text-xs font-bold">
-                                                {g === "MALE"
-                                                    ? "Male"
-                                                    : "Female"}
-                                            </span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="col-span-full space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase">
-                                    Favorite Bible Verse
-                                </label>
-                                <textarea
-                                    name="favoriteVerse"
-                                    required
-                                    disabled={isLoading}
-                                    defaultValue={initialData?.favoriteVerse}
-                                    rows={2}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-[#4C0B81]"
-                                    placeholder="e.g. John 3:16"
-                                />
-                            </div>
-
+                            {/* Actions */}
                             <div className="col-span-full pt-4">
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full bg-[#4C0B81] text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-[#37085e] flex items-center justify-center gap-2 transition-all"
+                                    className="w-full bg-[#4C0B81] text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-[#37085e] flex items-center justify-center gap-2 transition-all disabled:opacity-50"
                                 >
                                     {isLoading ? (
                                         <Loader2
@@ -335,9 +242,9 @@ export default function AddMemberModal({
                                             size={20}
                                         />
                                     ) : isEditMode ? (
-                                        "Update Member Details"
+                                        "Update Member"
                                     ) : (
-                                        "Save Member to Database"
+                                        "Save Member"
                                     )}
                                 </button>
                             </div>
