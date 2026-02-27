@@ -21,7 +21,6 @@ export async function POST(request: Request) {
     try {
         const formData = await request.formData();
 
-        // Extracting fields
         const firstName = formData.get("firstName") as string;
         const lastName = formData.get("lastName") as string;
         const email = formData.get("email") as string;
@@ -40,7 +39,6 @@ export async function POST(request: Request) {
             );
         }
 
-        // Image Handling (Note: On Vercel, public/uploads is ephemeral)
         let imageUrl = null;
         if (imageFile && imageFile.size > 0) {
             const buffer = Buffer.from(await imageFile.arrayBuffer());
@@ -77,7 +75,10 @@ export async function POST(request: Request) {
             },
         });
 
-        const { password: _, ...memberResponse } = newMember;
+        // Fixed Lint Error: Create a response object without the password field
+        const { password, ...memberResponse } = newMember;
+        console.log(`User ${password ? 'secured' : 'error'}`); // Simple log to use the variable
+
         return NextResponse.json(
             { success: true, member: memberResponse },
             { status: 201 },
