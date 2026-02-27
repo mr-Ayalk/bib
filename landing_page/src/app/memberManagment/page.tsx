@@ -26,15 +26,11 @@ export default function AddMemberModal({
 
     if (!isOpen) return null;
 
-    // Handle Image Selection and conversion to Base64
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             if (file.size > 2 * 1024 * 1024) {
-                // 2MB Limit check
-                setErrorMessage(
-                    "Image is too large. Please select a file under 2MB.",
-                );
+                setErrorMessage("Image is too large. Please select a file under 2MB.");
                 setStatus("error");
                 return;
             }
@@ -52,21 +48,21 @@ export default function AddMemberModal({
         setStatus("idle");
         setErrorMessage("");
 
+        // FIX: Use FormData directly to match your API's 'await request.formData()'
         const formData = new FormData(e.currentTarget);
-        const rawData = Object.fromEntries(formData.entries());
-
-        // Prepare the final payload
-        const payload = {
-            ...rawData,
-            subCircleNumber: Number(rawData.subCircleNumber),
-            photo: imagePreview, // This will be the Base64 string
-        };
+        
+        // If there's a file in the ref, ensure it's in the FormData
+        const file = fileInputRef.current?.files?.[0];
+        if (file) {
+            formData.set("image", file);
+        }
 
         try {
             const res = await fetch("/api/members", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
+                // Note: Don't set Content-Type header when sending FormData; 
+                // the browser sets it automatically with the correct boundary.
+                body: formData, 
             });
 
             const result = await res.json();
@@ -83,7 +79,8 @@ export default function AddMemberModal({
                 setStatus("error");
                 setErrorMessage(result.error || "Failed to save member");
             }
-        } catch (err) {
+        } catch { 
+            // FIX: Removed (err) to satisfy the 'no-unused-vars' linter rule
             setStatus("error");
             setErrorMessage("Connection error. Please check your database.");
         } finally {
@@ -130,8 +127,7 @@ export default function AddMemberModal({
                                 MEMBER REGISTERED!
                             </h3>
                             <p className="text-slate-500 font-medium text-center">
-                                The new member has been successfully added to
-                                the database.
+                                The new member has been successfully added to the database.
                             </p>
                         </div>
                     ) : (
@@ -149,9 +145,7 @@ export default function AddMemberModal({
                             {/* Image Upload Section */}
                             <div className="col-span-full flex flex-col items-center mb-4">
                                 <div
-                                    onClick={() =>
-                                        fileInputRef.current?.click()
-                                    }
+                                    onClick={() => fileInputRef.current?.click()}
                                     className="relative w-28 h-28 rounded-full border-4 border-slate-100 shadow-inner bg-slate-50 flex items-center justify-center cursor-pointer group overflow-hidden"
                                 >
                                     {imagePreview ? (
@@ -167,10 +161,7 @@ export default function AddMemberModal({
                                         />
                                     )}
                                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                        <Camera
-                                            className="text-white"
-                                            size={24}
-                                        />
+                                        <Camera className="text-white" size={24} />
                                     </div>
                                 </div>
                                 <input
@@ -185,11 +176,9 @@ export default function AddMemberModal({
                                 </p>
                             </div>
 
-                            {/* Name Fields */}
+                            {/* First Name */}
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
-                                    First Name
-                                </label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">First Name</label>
                                 <input
                                     type="text"
                                     name="firstName"
@@ -199,10 +188,9 @@ export default function AddMemberModal({
                                 />
                             </div>
 
+                            {/* Last Name */}
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
-                                    Last Name
-                                </label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Last Name</label>
                                 <input
                                     type="text"
                                     name="lastName"
@@ -212,11 +200,9 @@ export default function AddMemberModal({
                                 />
                             </div>
 
-                            {/* Contact & Bio */}
+                            {/* Email */}
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
-                                    Email Address
-                                </label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Email Address</label>
                                 <input
                                     type="email"
                                     name="email"
@@ -226,10 +212,9 @@ export default function AddMemberModal({
                                 />
                             </div>
 
+                            {/* Birth Date */}
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
-                                    Birth Date
-                                </label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Birth Date</label>
                                 <input
                                     type="text"
                                     name="birthDayMonth"
@@ -240,11 +225,9 @@ export default function AddMemberModal({
                                 />
                             </div>
 
-                            {/* Academic Details */}
+                            {/* Department */}
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
-                                    Department
-                                </label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Department</label>
                                 <input
                                     type="text"
                                     name="department"
@@ -254,10 +237,9 @@ export default function AddMemberModal({
                                 />
                             </div>
 
+                            {/* Year Group */}
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
-                                    Year Group
-                                </label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Year Group</label>
                                 <select
                                     name="batch"
                                     disabled={isLoading}
@@ -271,11 +253,9 @@ export default function AddMemberModal({
                                 </select>
                             </div>
 
-                            {/* Sub-Circle & Gender */}
+                            {/* Sub-Circle */}
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
-                                    Sub-Circle (1-5)
-                                </label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Sub-Circle (1-5)</label>
                                 <input
                                     type="number"
                                     name="subCircleNumber"
@@ -287,43 +267,24 @@ export default function AddMemberModal({
                                 />
                             </div>
 
+                            {/* Gender */}
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
-                                    Gender
-                                </label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Gender</label>
                                 <div className="flex gap-3">
                                     <label className="flex-1 flex items-center justify-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 has-[:checked]:border-[#4C0B81] has-[:checked]:bg-purple-50">
-                                        <input
-                                            type="radio"
-                                            name="gender"
-                                            value="MALE"
-                                            required
-                                            className="accent-[#4C0B81]"
-                                        />
-                                        <span className="text-xs font-bold text-slate-700">
-                                            Male
-                                        </span>
+                                        <input type="radio" name="gender" value="MALE" required className="accent-[#4C0B81]" />
+                                        <span className="text-xs font-bold text-slate-700">Male</span>
                                     </label>
                                     <label className="flex-1 flex items-center justify-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 has-[:checked]:border-[#4C0B81] has-[:checked]:bg-purple-50">
-                                        <input
-                                            type="radio"
-                                            name="gender"
-                                            value="FEMALE"
-                                            required
-                                            className="accent-[#4C0B81]"
-                                        />
-                                        <span className="text-xs font-bold text-slate-700">
-                                            Female
-                                        </span>
+                                        <input type="radio" name="gender" value="FEMALE" required className="accent-[#4C0B81]" />
+                                        <span className="text-xs font-bold text-slate-700">Female</span>
                                     </label>
                                 </div>
                             </div>
 
-                            {/* Verse */}
+                            {/* Favorite Verse */}
                             <div className="col-span-full space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
-                                    Favorite Bible Verse
-                                </label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Favorite Bible Verse</label>
                                 <textarea
                                     name="favoriteVerse"
                                     required
@@ -341,13 +302,7 @@ export default function AddMemberModal({
                                     className="w-full bg-[#4C0B81] text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-[#37085e] disabled:bg-slate-300 transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-100"
                                 >
                                     {isLoading ? (
-                                        <>
-                                            <Loader2
-                                                className="animate-spin"
-                                                size={20}
-                                            />
-                                            Processing...
-                                        </>
+                                        <><Loader2 className="animate-spin" size={20} /> Processing...</>
                                     ) : (
                                         "Save Member to Database"
                                     )}

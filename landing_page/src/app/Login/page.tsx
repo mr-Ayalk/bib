@@ -19,21 +19,6 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
 
     // --- Authentication Logic ---
-    // const handleLogin = async (e: React.FormEvent) => {
-    //     e.preventDefault();
-    //     setError("");
-    //     setIsLoading(true);
-
-    //     // Mimicking a small delay for realism
-    //     setTimeout(() => {
-    //         if (username === "Admin" && password === "1234") {
-    //             router.push("/dashboard");
-    //         } else {
-    //             setError("Invalid username or password. Please try again.");
-    //             setIsLoading(false);
-    //         }
-    //     }, 800);
-    // };
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
@@ -42,64 +27,67 @@ export default function LoginPage() {
         try {
             const res = await fetch("/api/login", {
                 method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),
             });
             const data = await res.json();
 
             if (res.ok) {
-                // Check role and redirect
                 if (data.role === "ADMIN") {
                     router.push("/admin-dashboard");
                 } else {
                     router.push("/dashboard");
                 }
             } else {
-                setError(data.error);
+                setError(data.error || "Login failed");
             }
-        } catch (err) {
+        } catch {
+            // Notice how I removed (_unusedErr) entirely.
+            // This is called "Optional Catch Binding" and is 100% valid.
             setError("Something went wrong. Check your connection.");
         } finally {
             setIsLoading(false);
         }
     };
+
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-purple-100">
-            {/* --- Header (AAU Inspired) --- */}
-            <header className="bg-white border-b py-4 px-6 flex justify-between items-center shadow-sm sticky top-0 z-50">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0A] flex flex-col font-sans selection:bg-purple-100 transition-colors duration-300">
+            {/* --- Header --- */}
+            <header className="bg-white dark:bg-[#0F0F0F] border-b border-slate-100 dark:border-slate-800 py-4 px-6 flex justify-between items-center shadow-sm sticky top-0 z-50">
                 <div className="flex items-center gap-3">
                     <div className="relative w-12 h-12">
                         <Image
                             src={logoImage}
                             alt="5K Logo"
                             fill
-                            className="rounded-full object-cover border border-slate-100 shadow-sm"
+                            className="rounded-full object-cover border border-slate-100 dark:border-slate-700 shadow-sm"
                         />
                     </div>
                     <div>
-                        <h1 className="text-[#4C0B81] font-black text-lg leading-tight uppercase tracking-tight">
+                        <h1 className="text-[#4C0B81] dark:text-purple-400 font-black text-lg leading-tight uppercase tracking-tight">
                             5K Bible Study
                         </h1>
-                        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">
+                        <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest">
                             Addis Ababa University Fellowship
                         </p>
                     </div>
                 </div>
-                <nav className="hidden md:flex gap-8 text-sm font-bold text-slate-600 uppercase tracking-wide">
+                <nav className="hidden md:flex gap-8 text-sm font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide">
                     <Link
                         href="/"
-                        className="hover:text-[#4C0B81] transition-colors"
+                        className="hover:text-[#4C0B81] dark:hover:text-purple-400 transition-colors"
                     >
                         Home
                     </Link>
                     <Link
                         href="/Programs"
-                        className="hover:text-[#4C0B81] transition-colors"
+                        className="hover:text-[#4C0B81] dark:hover:text-purple-400 transition-colors"
                     >
                         Programs
                     </Link>
                     <Link
                         href="/About"
-                        className="hover:text-[#4C0B81] transition-colors"
+                        className="hover:text-[#4C0B81] dark:hover:text-purple-400 transition-colors"
                     >
                         About
                     </Link>
@@ -108,8 +96,8 @@ export default function LoginPage() {
 
             <main className="flex-1 flex items-center justify-center p-6 lg:p-12 relative overflow-hidden">
                 {/* Background Decoration */}
-                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-purple-200/20 blur-3xl rounded-full" />
-                <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-96 h-96 bg-orange-200/20 blur-3xl rounded-full" />
+                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-purple-200/20 dark:bg-purple-900/10 blur-3xl rounded-full" />
+                <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-96 h-96 bg-orange-200/20 dark:bg-orange-900/10 blur-3xl rounded-full" />
 
                 <div className="max-w-6xl w-full grid lg:grid-cols-2 gap-12 items-center relative z-10">
                     {/* --- LEFT SIDE: Info Cards --- */}
@@ -118,9 +106,9 @@ export default function LoginPage() {
                         animate={{ opacity: 1, x: 0 }}
                         className="hidden lg:flex flex-col gap-5"
                     >
-                        <h2 className="text-4xl font-black text-slate-800 leading-tight mb-4">
+                        <h2 className="text-4xl font-black text-slate-800 dark:text-white leading-tight mb-4">
                             Deepen Your Faith, <br />
-                            <span className="text-[#4C0B81]">
+                            <span className="text-[#4C0B81] dark:text-purple-400">
                                 Shape Your Future.
                             </span>
                         </h2>
@@ -165,17 +153,17 @@ export default function LoginPage() {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden"
+                        className="bg-white dark:bg-[#121212] rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-800 overflow-hidden"
                     >
                         <div className="p-10 lg:p-14">
                             <div className="text-center mb-10">
-                                <h2 className="text-3xl font-black text-slate-800 tracking-tight">
+                                <h2 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">
                                     Login
                                 </h2>
-                                <p className="text-slate-500 text-sm font-medium mt-1">
+                                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-1">
                                     Enter your credentials to continue
                                 </p>
-                                <div className="h-1.5 w-12 bg-[#4C0B81] mx-auto mt-4 rounded-full" />
+                                <div className="h-1.5 w-12 bg-[#4C0B81] dark:bg-purple-500 mx-auto mt-4 rounded-full" />
                             </div>
 
                             <AnimatePresence mode="wait">
@@ -184,7 +172,7 @@ export default function LoginPage() {
                                         initial={{ opacity: 0, height: 0 }}
                                         animate={{ opacity: 1, height: "auto" }}
                                         exit={{ opacity: 0, height: 0 }}
-                                        className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl flex items-center gap-3 text-sm font-bold"
+                                        className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 rounded-2xl flex items-center gap-3 text-sm font-bold"
                                     >
                                         <AlertCircle size={20} />
                                         {error}
@@ -194,7 +182,7 @@ export default function LoginPage() {
 
                             <form onSubmit={handleLogin} className="space-y-5">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
+                                    <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">
                                         Username
                                     </label>
                                     <div className="relative group">
@@ -209,13 +197,13 @@ export default function LoginPage() {
                                                 setUsername(e.target.value)
                                             }
                                             placeholder="e.g. Tebe"
-                                            className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-purple-500/10 focus:border-[#4C0B81] outline-none transition-all font-medium text-slate-700"
+                                            className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-purple-500/10 focus:border-[#4C0B81] dark:focus:border-purple-500 outline-none transition-all font-medium text-slate-700 dark:text-slate-200"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
+                                    <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">
                                         Password
                                     </label>
                                     <div className="relative group">
@@ -230,7 +218,7 @@ export default function LoginPage() {
                                                 setPassword(e.target.value)
                                             }
                                             placeholder="••••••••"
-                                            className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-purple-500/10 focus:border-[#4C0B81] outline-none transition-all font-medium text-slate-700"
+                                            className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-[#1A1A1A] border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-purple-500/10 focus:border-[#4C0B81] dark:focus:border-purple-500 outline-none transition-all font-medium text-slate-700 dark:text-slate-200"
                                         />
                                     </div>
                                 </div>
@@ -238,7 +226,7 @@ export default function LoginPage() {
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full bg-[#4C0B81] text-white font-black py-4 rounded-2xl shadow-xl shadow-purple-900/20 hover:bg-[#3a0863] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed uppercase tracking-widest text-sm"
+                                    className="w-full bg-[#4C0B81] dark:bg-purple-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-purple-900/20 hover:bg-[#3a0863] dark:hover:bg-purple-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed uppercase tracking-widest text-sm"
                                 >
                                     {isLoading ? (
                                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -251,17 +239,16 @@ export default function LoginPage() {
                             </form>
 
                             <div className="mt-8 text-center">
-                                <button className="text-sm font-bold text-slate-400 hover:text-[#4C0B81] transition-colors">
+                                <button className="text-sm font-bold text-slate-400 dark:text-slate-500 hover:text-[#4C0B81] dark:hover:text-purple-400 transition-colors">
                                     Forgot Password?
                                 </button>
                             </div>
                         </div>
 
-                        {/* Registration Footer */}
-                        <div className="bg-slate-50 p-8 border-t border-slate-100 text-center">
+                        <div className="bg-slate-50 dark:bg-[#0F0F0F] p-8 border-t border-slate-100 dark:border-slate-800 text-center">
                             <button
                                 onClick={() => setShowPopup(true)}
-                                className="text-[#4C0B81] font-black text-sm uppercase tracking-tight hover:underline transition-all"
+                                className="text-[#4C0B81] dark:text-purple-400 font-black text-sm uppercase tracking-tight hover:underline transition-all"
                             >
                                 New to the fellowship? Join here
                             </button>
@@ -270,7 +257,7 @@ export default function LoginPage() {
                 </div>
             </main>
 
-            {/* --- POPUP MODAL (Member Info) --- */}
+            {/* --- POPUP MODAL --- */}
             <AnimatePresence>
                 {showPopup && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -279,38 +266,38 @@ export default function LoginPage() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setShowPopup(false)}
-                            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+                            className="absolute inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-md"
                         />
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0, y: 20 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            className="bg-white rounded-[2.5rem] p-8 lg:p-12 max-w-md w-full shadow-2xl relative z-10"
+                            className="bg-white dark:bg-[#121212] rounded-[2.5rem] p-8 lg:p-12 max-w-md w-full shadow-2xl relative z-10 border border-slate-100 dark:border-slate-800"
                         >
                             <button
                                 onClick={() => setShowPopup(false)}
-                                className="absolute top-6 right-6 p-2 hover:bg-slate-100 rounded-full transition-colors"
+                                className="absolute top-6 right-6 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                             >
                                 <X size={20} className="text-slate-400" />
                             </button>
 
                             <div className="text-center">
-                                <div className="bg-purple-100 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 rotate-3">
+                                <div className="bg-purple-100 dark:bg-purple-900/30 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 rotate-3">
                                     <Info
-                                        className="text-[#4C0B81]"
+                                        className="text-[#4C0B81] dark:text-purple-400"
                                         size={40}
                                     />
                                 </div>
-                                <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tight">
+                                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">
                                     Welcome to 5K!
                                 </h3>
-                                <p className="text-slate-600 leading-relaxed mb-8 font-medium">
+                                <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-8 font-medium">
                                     Join our community of scholars and
                                     believers. Registration is currently
                                     facilitated through our mentor network.
                                 </p>
-                                <div className="bg-orange-50 p-5 rounded-2xl border border-orange-100 mb-8">
-                                    <p className="text-sm font-bold text-orange-800">
+                                <div className="bg-orange-50 dark:bg-orange-900/10 p-5 rounded-2xl border border-orange-100 dark:border-orange-900/20 mb-8">
+                                    <p className="text-sm font-bold text-orange-800 dark:text-orange-300">
                                         Check the joining instructions in the{" "}
                                         <Link
                                             href="/FAQ"
@@ -322,7 +309,7 @@ export default function LoginPage() {
                                 </div>
                                 <button
                                     onClick={() => setShowPopup(false)}
-                                    className="w-full py-4 bg-slate-900 text-white font-black rounded-2xl shadow-lg uppercase tracking-widest text-xs"
+                                    className="w-full py-4 bg-slate-900 dark:bg-purple-600 text-white font-black rounded-2xl shadow-lg uppercase tracking-widest text-xs"
                                 >
                                     Got it
                                 </button>

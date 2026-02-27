@@ -4,13 +4,15 @@ import bcrypt from "bcryptjs";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
+// 1. GET: Fetch all members
 export async function GET() {
     try {
         const members = await prisma.member.findMany({
             orderBy: { firstName: "asc" },
         });
         return NextResponse.json(members);
-    } catch (error) {
+    } catch {
+        // Removed 'error' variable to satisfy 'no-unused-vars'
         return NextResponse.json(
             { error: "Failed to fetch members" },
             { status: 500 },
@@ -18,6 +20,7 @@ export async function GET() {
     }
 }
 
+// 2. POST: Create a new member
 export async function POST(request: Request) {
     try {
         const formData = await request.formData();
@@ -36,7 +39,7 @@ export async function POST(request: Request) {
         // Extract the file
         const imageFile = formData.get("image") as File | null;
 
-        // 1. Basic Validation
+        // Basic Validation
         if (!firstName || !lastName || !email || !gender) {
             return NextResponse.json(
                 { error: "Missing required fields" },
@@ -44,7 +47,7 @@ export async function POST(request: Request) {
             );
         }
 
-        // 2. Handle File Upload (Saving to public/uploads)
+        // Handle File Upload
         let imageUrl = null;
         if (imageFile && imageFile.size > 0) {
             const buffer = Buffer.from(await imageFile.arrayBuffer());
@@ -52,25 +55,20 @@ export async function POST(request: Request) {
             const uploadDir = path.join(process.cwd(), "public", "uploads");
 
             try {
-                // Ensure the directory exists
                 await mkdir(uploadDir, { recursive: true });
-                // Write the file
                 await writeFile(path.join(uploadDir, filename), buffer);
-                // The URL path we will store in the DB
                 imageUrl = `/uploads/${filename}`;
             } catch (err) {
                 console.error("File Save Error:", err);
-                // Continue without image if save fails, or throw error
+                // Continue without image if save fails
             }
         }
 
-        // 3. Generate a unique username
+        // Generate unique username & hash default password
         const generatedUsername = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(100 + Math.random() * 900)}`;
-
-        // 4. Security: Hash the default password
         const hashedPassword = await bcrypt.hash("changeme123", 10);
 
-        // 5. Save to Prisma (Using your exact schema field names)
+        // Save to Database
         const newMember = await prisma.member.create({
             data: {
                 firstName,
@@ -80,26 +78,35 @@ export async function POST(request: Request) {
                 password: hashedPassword,
                 department,
                 batch,
-                gender: gender, // Matches Enum
+                gender,
                 subCircleNumber: parseInt(subCircleNumber) || 0,
                 birthDayMonth: birthDayMonth || "Not Provided",
                 favoriteVerse: favoriteVerse || "To be updated",
-                image: imageUrl, // Storing the path string
+                image: imageUrl,
                 role: "USER",
             },
         });
 
-        // Remove password from response for security
-        const { password: _, ...memberData } = newMember;
+        // LINT FIX: Avoid unused '_' variable by cloning and deleting the property
+        // We use 'Record<string, unknown>' to safely handle the deletion logic
+        const memberResponse = { ...newMember } as Record<string, unknown>;
+        delete memberResponse.password;
 
         return NextResponse.json(
-            { success: true, member: memberData },
+            { success: true, member: memberResponse },
             { status: 201 },
         );
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Create Error Detail:", error);
 
-        if (error.code === "P2002") {
+        // LINT FIX: Type guard to check for Prisma P2002 (Unique Constraint)
+        // without using 'any'
+        if (
+            error &&
+            typeof error === "object" &&
+            "code" in error &&
+            (error as { code: string }).code === "P2002"
+        ) {
             return NextResponse.json(
                 {
                     error: "A member with this email or username already exists.",
@@ -109,7 +116,7 @@ export async function POST(request: Request) {
         }
 
         return NextResponse.json(
-            { error: "Internal Server Error: " + error.message },
+            { error: "Internal Server Error" },
             { status: 500 },
         );
     }

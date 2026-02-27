@@ -24,7 +24,9 @@ export async function POST(request: Request) {
             role: user.role,
             name: `${user.firstName} ${user.lastName}`,
         });
-    } catch (error) {
+    } catch (_error) {
+        // Simply add the underscore
+        console.error(_error); // Optional: You can actually log it now!
         return NextResponse.json({ error: "Server error" }, { status: 500 });
     }
 }

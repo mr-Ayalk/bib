@@ -28,17 +28,28 @@ import {
 } from "recharts";
 import AddMemberModal from "../../sections/AddMemberModal";
 
-// Expanded color palette for batches
+// 1. Define the Member interface to fix 'never' type errors
+interface Member {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    gender: "MALE" | "FEMALE";
+    department: string;
+    batch: string;
+    subCircleNumber: string | number;
+}
+
 const BATCH_COLORS = ["#4C0B81", "#8B5CF6", "#D946EF", "#06B6D4", "#10B981"];
-const GENDER_COLORS = {
-    Male: "#4C0B81", // Deep Purple
-    Female: "#F97316", // Vibrant Orange
+const GENDER_COLORS: Record<string, string> = {
+    Male: "#4C0B81",
+    Female: "#F97316",
 };
 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState("Dashboard");
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [members, setMembers] = useState([]);
+    const [members, setMembers] = useState<Member[]>([]); // Typed state
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -56,9 +67,9 @@ export default function AdminDashboard() {
         fetchMembers();
     }, []);
 
-    // 1. Data Processing for Gender with specific Orange/Purple logic
+    // 2. Fix Index Signature errors by typing the Reducer accumulator
     const genderData = useMemo(() => {
-        const counts = members.reduce((acc, member) => {
+        const counts = members.reduce((acc: Record<string, number>, member) => {
             const g = member.gender === "MALE" ? "Male" : "Female";
             acc[g] = (acc[g] || 0) + 1;
             return acc;
@@ -69,9 +80,8 @@ export default function AdminDashboard() {
         }));
     }, [members]);
 
-    // 2. Data Processing for Academic Year (Dynamic Bar Colors)
     const batchData = useMemo(() => {
-        const counts = members.reduce((acc, member) => {
+        const counts = members.reduce((acc: Record<string, number>, member) => {
             const b = member.batch || "Unknown";
             acc[b] = (acc[b] || 0) + 1;
             return acc;
@@ -81,7 +91,7 @@ export default function AdminDashboard() {
             .map((key, index) => ({
                 year: key,
                 students: counts[key],
-                fill: BATCH_COLORS[index % BATCH_COLORS.length], // Assign color per bar
+                fill: BATCH_COLORS[index % BATCH_COLORS.length],
             }));
     }, [members]);
 
@@ -94,16 +104,24 @@ export default function AdminDashboard() {
         { name: "Upcoming Events", icon: <Calendar size={20} /> },
     ];
 
+    // Added a check for loading to resolve the "unused loading" warning
+    if (loading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                Loading...
+            </div>
+        );
+    }
+
     return (
         <div className="flex h-screen bg-[#F8FAFC]">
-            {/* Sidebar Navigation */}
             <aside className="w-72 bg-[#4C0B81] text-white p-6 flex flex-col shadow-2xl">
                 <div className="flex items-center gap-3 mb-10">
                     <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center border border-white/20 shadow-lg shadow-orange-500/20">
                         <TrendingUp className="text-white" size={24} />
                     </div>
-                    <h1 className="text-xl font-black tracking-tighter">
-                        EXECUTIVE HUB
+                    <h1 className="text-xl font-black tracking-tighter uppercase">
+                        Executive Hub
                     </h1>
                 </div>
 
@@ -140,7 +158,6 @@ export default function AdminDashboard() {
             </aside>
 
             <div className="flex flex-col w-full overflow-y-auto">
-                {/* Main Content Area */}
                 <main className="flex-1 flex flex-col">
                     <header className="px-10 py-6 bg-white flex justify-between items-center border-b border-slate-100 sticky top-0 z-10">
                         <div>
@@ -169,7 +186,6 @@ export default function AdminDashboard() {
                     <div className="flex-1 p-10 space-y-8">
                         {activeTab === "Dashboard" && (
                             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                                {/* Summary Card */}
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                                     <div className="bg-white p-6 rounded-[2rem] border border-slate-100 flex items-center gap-5 shadow-sm">
                                         <div className="p-4 bg-orange-50 rounded-2xl text-orange-500">
@@ -187,7 +203,6 @@ export default function AdminDashboard() {
                                 </div>
 
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                    {/* Gender Distribution - Custom Colors */}
                                     <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
                                         <h3 className="font-black text-slate-700 uppercase text-xs tracking-[0.2em] mb-8">
                                             Gender distribution
@@ -239,7 +254,6 @@ export default function AdminDashboard() {
                                         </div>
                                     </div>
 
-                                    {/* Academic Year - Dynamic Bar Heights and Colors */}
                                     <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
                                         <h3 className="font-black text-slate-700 uppercase text-xs tracking-[0.2em] mb-8">
                                             Batch Breakdown
@@ -308,7 +322,6 @@ export default function AdminDashboard() {
                             </div>
                         )}
 
-                        {/* Members List Table remains consistent with style */}
                         {activeTab === "Members" && (
                             <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-in fade-in duration-500">
                                 <div className="p-6 border-b border-slate-50 flex items-center gap-4 bg-slate-50/50">
@@ -404,6 +417,9 @@ export default function AdminDashboard() {
                 <AddMemberModal
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
+                    // 3. Fix missing props errors
+                    onSuccess={() => {}}
+                    initialData={null}
                 />
             </div>
         </div>

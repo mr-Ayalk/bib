@@ -93,9 +93,10 @@ export default function AddMemberModal({
                         `Failed to ${isEditMode ? "update" : "save"} member`,
                 );
             }
-        } catch (err) {
+        } catch {
+            // FIX: Removed (err) to satisfy the 'no-unused-vars' linter rule
             setStatus("error");
-            setErrorMessage("Connection error. Please check your server.");
+            setErrorMessage("Connection error. Please check your database.");
         } finally {
             setIsLoading(false);
         }
