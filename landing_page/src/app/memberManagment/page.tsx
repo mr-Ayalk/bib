@@ -1,10 +1,15 @@
-// src/app/memberManagment/page.tsx
 "use client";
 import React, { useState } from "react";
 import AddMemberModal from "@/sections/AddMemberModal";
 
 export default function MemberManagementPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // This function runs after the modal successfully saves a member
+    const handleRefresh = () => {
+        console.log("Member added successfully! Refreshing data...");
+        // If you have a fetch function for your list, call it here.
+    };
 
     return (
         <div className="p-10">
@@ -17,11 +22,11 @@ export default function MemberManagementPage() {
                 Add New Member
             </button>
 
-            {/* Now the default export of this file is a page, 
-                and the modal is just a component inside it. */}
             <AddMemberModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                onSuccess={handleRefresh} // Pass the success handler
+                initialData={null} // Pass null because we are adding, not editing
             />
         </div>
     );
