@@ -26,7 +26,9 @@ const SocialLinks = () => (
     <div className="flex space-x-5 mt-6">
         {/* Telegram */}
         <a
-            href="#"
+            href="https://t.me/+ouPuFGAGna80YjVk"
+            target="_blank"
+            rel="noopener noreferrer"
             aria-label="Telegram"
             className="text-gray-400 hover:text-blue-400 transition-all transform hover:scale-110"
         >
@@ -34,7 +36,9 @@ const SocialLinks = () => (
         </a>
         {/* Instagram */}
         <a
-            href="#"
+            href="https://www.instagram.com/5kilofellowship/"
+            target="_blank"
+            rel="noopener noreferrer"
             aria-label="Instagram"
             className="text-gray-400 hover:text-pink-500 transition-all transform hover:scale-110"
         >
@@ -42,7 +46,9 @@ const SocialLinks = () => (
         </a>
         {/* TikTok */}
         <a
-            href="#"
+            href="https://www.tiktok.com/@5kilofellow"
+            target="_blank"
+            rel="noopener noreferrer"
             aria-label="TikTok"
             className="text-gray-400 hover:text-white transition-all transform hover:scale-110"
         >
@@ -51,6 +57,8 @@ const SocialLinks = () => (
         {/* YouTube */}
         <a
             href="#"
+            target="_blank"
+            rel="noopener noreferrer"
             aria-label="YouTube"
             className="text-gray-400 hover:text-red-500 transition-all transform hover:scale-110"
         >

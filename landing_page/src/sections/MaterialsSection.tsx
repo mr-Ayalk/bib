@@ -42,8 +42,8 @@ const otherResources = [
         description:
             "Mastering the basics of following Jesus: prayer, word, and consistent fellowship.",
         date: "Dec 05, 2025",
-        fileUrl: "/materials/discipleship.pdf",
-        fileName: "Discipleship_Foundations.pdf",
+        fileUrl: "/materials/ibs_guide_5k.pdf",
+        fileName: "IBS_GUIDE_5K.pdf",
     },
 ];
 
