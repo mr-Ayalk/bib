@@ -1,7 +1,7 @@
 "use client";
-import React from "react";
-import { motion } from "framer-motion";
-import { Calendar, Sparkles, Bell } from "lucide-react";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Calendar, Sparkles, Bell, X, Send, CheckCircle2 } from "lucide-react";
 import Tag from "@/components/Tag";
 
 const upcomingEvents = [
@@ -44,7 +44,27 @@ const upcomingEvents = [
 ];
 
 export default function Upcoming() {
+    const [isPaused, setIsPaused] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [email, setEmail] = useState("");
+    const [showToast, setShowToast] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState("");
+
     const duplicatedEvents = [...upcomingEvents, ...upcomingEvents];
+
+    const handleNotifyClick = (eventTitle: string) => {
+        setSelectedEvent(eventTitle);
+        setShowModal(true);
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        // Here you would typically send the email to your backend
+        setShowModal(false);
+        setEmail("");
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 4000); // Hide toast after 4s
+    };
 
     return (
         <section className="relative py-12 md:py-16 bg-white dark:bg-[#050505] overflow-hidden transition-colors duration-700">
@@ -78,13 +98,14 @@ export default function Upcoming() {
             </div>
 
             <div className="relative flex items-center">
-                {/* Edge Fades for Seamless Scrolling */}
                 <div className="absolute inset-y-0 left-0 w-24 md:w-64 z-20 bg-gradient-to-r from-white dark:from-[#050505] via-white/80 dark:via-[#050505]/80 to-transparent pointer-events-none" />
                 <div className="absolute inset-y-0 right-0 w-24 md:w-64 z-20 bg-gradient-to-l from-white dark:from-[#050505] via-white/80 dark:via-[#050505]/80 to-transparent pointer-events-none" />
 
                 <motion.div
-                    className="flex whitespace-nowrap gap-6 py-6 px-4"
-                    animate={{ x: ["0%", "-50%"] }}
+                    className="flex whitespace-nowrap gap-6 py-6 px-4 cursor-pointer"
+                    animate={{ x: isPaused ? undefined : ["0%", "-50%"] }}
+                    onHoverStart={() => setIsPaused(true)}
+                    onHoverEnd={() => setIsPaused(false)}
                     transition={{
                         x: {
                             repeat: Infinity,
@@ -93,7 +114,6 @@ export default function Upcoming() {
                             ease: "linear",
                         },
                     }}
-                    whileHover={{ transition: { duration: 80 } }}
                 >
                     {duplicatedEvents.map((event, index) => (
                         <div
@@ -129,9 +149,13 @@ export default function Upcoming() {
                                             </span>
                                         </div>
 
-                                        <button className="inline-flex items-center gap-2 bg-[#6A0DAD] hover:bg-[#FF6600] text-white px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 active:scale-95 shadow-md shadow-purple-500/10">
-                                            <Bell size={12} />
-                                            Notify
+                                        <button
+                                            onClick={() =>
+                                                handleNotifyClick(event.title)
+                                            }
+                                            className="inline-flex items-center gap-2 bg-[#6A0DAD] hover:bg-[#FF6600] text-white px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 active:scale-95 shadow-md shadow-purple-500/10"
+                                        >
+                                            <Bell size={12} /> Notify
                                         </button>
                                     </div>
                                 </div>
@@ -140,6 +164,92 @@ export default function Upcoming() {
                     ))}
                 </motion.div>
             </div>
+
+            {/* NOTIFY MODAL */}
+            <AnimatePresence>
+                {showModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowModal(false)}
+                            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                        />
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-2xl border border-slate-100 dark:border-white/10"
+                        >
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                            <div className="mb-6">
+                                <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center text-[#6A0DAD] dark:text-purple-400 mb-4">
+                                    <Bell size={24} />
+                                </div>
+                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                                    Get Notified
+                                </h3>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm">
+                                    We&apos;ll email you as soon as registration
+                                    opens for{" "}
+                                    <span className="font-bold text-slate-900 dark:text-slate-200">
+                                        {selectedEvent}
+                                    </span>
+                                    .
+                                </p>
+                            </div>
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <div className="relative">
+                                    <input
+                                        type="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) =>
+                                            setEmail(e.target.value)
+                                        }
+                                        placeholder="Enter your email address"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 rounded-xl px-5 py-4 text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#6A0DAD] transition-all"
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="w-full bg-[#6A0DAD] hover:bg-[#520a85] text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                                >
+                                    <Send size={18} /> Keep Me Posted
+                                </button>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* CUSTOM TOAST NOTIFICATION */}
+            <AnimatePresence>
+                {showToast && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 50, x: "-50%" }}
+                        animate={{ opacity: 1, y: 0, x: "-50%" }}
+                        exit={{ opacity: 0, y: 20, x: "-50%" }}
+                        className="fixed bottom-10 left-1/2 z-[110] bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[320px]"
+                    >
+                        <div className="text-green-500">
+                            <CheckCircle2 size={24} />
+                        </div>
+                        <div>
+                            <p className="font-bold text-sm">Thank you!</p>
+                            <p className="text-xs opacity-80">
+                                We&apos;ll notify you when registration starts.
+                            </p>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </section>
     );
 }
