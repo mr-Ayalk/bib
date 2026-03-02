@@ -14,11 +14,11 @@ import img6 from "../assets/images/capture5.png";
 // Reuse or add more unique images for the 6-row look
 const galleryImages = [
     { id: 1, src: img1, alt: "Fellowship Gathering" },
-    { id: 2, src: img2, alt: "Leaders Session" },
+    { id: 2, src: img2, alt: "Community Study" },
     { id: 3, src: img3, alt: "Community Study" },
-    { id: 4, src: img4, alt: "Worship Moment" },
+    { id: 4, src: img4, alt: "Fellowship Gathering" },
     { id: 5, src: img5, alt: "Group Discussion" },
-    { id: 6, src: img6, alt: "Campus Outreach" },
+    { id: 6, src: img6, alt: "Prayer Time" },
 ];
 
 export default function Gallery() {
