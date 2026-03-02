@@ -15,7 +15,7 @@ const serviceData = [
     {
         title: "Manuscript Study",
         description:
-            "An intensive, distraction-free 3-week immersion into a specific biblical book. Join 100-150 students in deep exegesis every semester.",
+            "An intensive, distraction-free 3-Days immersion into a specific biblical book. Join 100-150 students in deep exegesis every semester.",
         thumbnailImage: socialmedia,
         linkUrl: "/Programs",
     },
