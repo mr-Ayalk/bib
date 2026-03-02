@@ -16,6 +16,7 @@ import bemni from "../assets/images/Beimnet-Abdi.jpg";
 import mase from "../assets/images/Masamo-Mathewos.jpg";
 
 import teme from "../assets/images/TEMESGEN-TAMIRAT.jpg";
+import hero11 from "../assets/images/hero11.png";
 const SLIDES = [
     {
         id: 1,
@@ -23,7 +24,7 @@ const SLIDES = [
         highlight: "Infinite Growth.",
         description:
             "Join a community of 500+ students dedicated to mastering the Word through structured, scripture-driven study designed for modern life over the past years.",
-        image: bibleLogo,
+        image: hero11,
         tag: "Academic Excellence in Scripture",
     },
     {
@@ -43,6 +44,15 @@ const SLIDES = [
             "Equipping the next generation of leaders to carry the message of grace from the campus of Addis Ababa to the ends of the earth.",
         image: thirdImage, // Replace with your third image
         tag: "Mission & Outreach",
+    },
+    {
+        id: 1,
+        title: "Deep Roots.",
+        highlight: "Infinite Growth.",
+        description:
+            "Join a community of 500+ students dedicated to mastering the Word through structured, scripture-driven study designed for modern life over the past years.",
+        image: bibleLogo,
+        tag: "Academic Excellence in Scripture",
     },
 ];
 
