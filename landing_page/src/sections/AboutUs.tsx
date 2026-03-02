@@ -108,18 +108,6 @@ const AboutSection: React.FC = () => {
                                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                             />
                         </div>
-                        {/* Smaller Floating Badge */}
-                        <div className="absolute -bottom-4 -right-4 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-xl border border-slate-100 dark:border-white/10 hidden md:block">
-                            <div className="flex items-center gap-3">
-                                <div className="text-2xl font-black text-[#6A0DAD]">
-                                    8
-                                </div>
-                                <div className="text-[8px] font-bold uppercase tracking-tighter text-slate-500 leading-tight">
-                                    Core Teams of
-                                    <br />5 Killo Fellowship
-                                </div>
-                            </div>
-                        </div>
                     </motion.div>
                 </div>
             </div>

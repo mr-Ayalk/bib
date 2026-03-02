@@ -41,13 +41,13 @@ const TournamentVictory: React.FC = () => {
                     <div className="text-center">
                         {/* Tag updated to brand purple */}
                         <Tag className="mb-4 scale-90">
-                            Tournament Champions
+                            Football Tournament Champions
                         </Tag>
 
                         <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter uppercase leading-tight">
                             5K FELLOW <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6A0DAD] to-[#FF6600]">
-                                TOURNAMENT WINNERS
+                                Football TOURNAMENT WINNERS
                             </span>
                         </h2>
 
