@@ -54,6 +54,7 @@ const serviceData = [
         thumbnailImage: webdesign,
         linkUrl: "/Programs",
     },
+    
 ];
 
 const ServicesSection: React.FC = () => {

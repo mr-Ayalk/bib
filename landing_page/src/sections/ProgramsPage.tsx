@@ -2,32 +2,26 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import {
-    ArrowRight,
-    BookOpen,
-    Users,
-    Star,
-    GraduationCap,
-  
-} from "lucide-react";
+import { BookOpen, Users, Star, GraduationCap } from "lucide-react";
 import Tag from "@/components/Tag";
 
 // Reuse your existing images or paths
 import manuscriptImg from "../assets/images/manuscript.png";
 import scriptureImg from "../assets/images/scripture.png";
 import weeklyImg from "../assets/images/weekly.png";
-import specialImg from "../assets/images/special.png";
-
+import specialImg from "../assets/images/recitaion.png";
+import gameImg from "../assets/images/game.png";
+import specialProgram from "../assets/images/special.png";
 const programs = [
     {
         title: "Manuscript Study",
         tag: "Deep Dive",
         icon: <BookOpen size={20} />,
         description:
-            "An intensive 3-week immersion. We remove the verse numbers and chapters, looking at the text in its rawest form to discover the author's original intent without modern distractions.",
+            "An intensive 3-days immersion. We remove the verse numbers and chapters, looking at the text in its rawest form to discover the author's original intent without modern distractions.",
         image: manuscriptImg,
         stats: {
-            duration: "3 Weeks",
+            duration: "3 Days",
             capacity: "150 Students",
             frequency: "Every Semester",
         },
@@ -63,8 +57,34 @@ const programs = [
         image: specialImg, // Replace with branding/recitation image
         stats: {
             duration: "Ongoing",
-            capacity: "30 Slots",
-            frequency: "Monthly",
+            capacity: "open",
+            frequency: "Weekly Performances",
+        },
+    },
+    {
+        title: "Game & Get-together",
+        tag: "Game and fun time",
+        icon: <GraduationCap size={20} />,
+        description:
+            "Beyond the books—fostering deep relationships through organized get-togethers, team games, and community events.",
+        image: gameImg, // Replace with branding/recitation image
+        stats: {
+            duration: "Ongoing",
+            capacity: "open",
+            frequency: "not specific",
+        },
+    },
+    {
+        title: "Special Programs",
+        tag: "Game and fun time",
+        icon: <GraduationCap size={20} />,
+        description:
+            "Building community through Semester Dinners, Freshers Welcomes, and Graduate Send-offs. Faith is meant to be shared.",
+        image: specialProgram, // Replace with branding/recitation image
+        stats: {
+            duration: "Ongoing",
+            capacity: "open",
+            frequency: "not specific",
         },
     },
 ];
@@ -73,7 +93,7 @@ const ProgramsSection: React.FC = () => {
     return (
         <main className="bg-white dark:bg-[#050505] transition-colors duration-700">
             {/* Header Section */}
-            <section className="pt-32 pb-16 px-6">
+            <section className="pt-16 pb-16 px-6">
                 <div className="max-w-4xl mx-auto text-center">
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
@@ -170,25 +190,13 @@ const ProgramsSection: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <button className="inline-flex items-center gap-2 text-[#6A0DAD] dark:text-purple-400 font-bold hover:gap-4 transition-all">
+                                {/* <button className="inline-flex items-center gap-2 text-[#6A0DAD] dark:text-purple-400 font-bold hover:gap-4 transition-all">
                                     Learn more about this program{" "}
                                     <ArrowRight size={20} />
-                                </button>
+                                </button> */}
                             </div>
                         </motion.div>
                     ))}
-                </div>
-            </section>
-
-            {/* Final CTA */}
-            <section className="py-20 bg-slate-50 dark:bg-white/5">
-                <div className="max-w-4xl mx-auto px-6 text-center">
-                    <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">
-                        Ready to deepen your faith?
-                    </h2>
-                    <button className="bg-[#6A0DAD] text-white px-10 py-4 rounded-2xl font-black shadow-xl shadow-purple-500/20 hover:scale-105 active:scale-95 transition-all">
-                        Register for Next Semester
-                    </button>
                 </div>
             </section>
         </main>
