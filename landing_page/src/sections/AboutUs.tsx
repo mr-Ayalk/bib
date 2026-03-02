@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import Tag from "@/components/Tag";
 import aboutImage from "../assets/images/abtus.png";
 import { Users, Target } from "lucide-react";
+import Link from "next/link";
 
 const AboutSection: React.FC = () => {
     return (
@@ -39,14 +40,20 @@ const AboutSection: React.FC = () => {
                                 One Team, One Mission
                             </h3>
                             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-5">
-                                The **5K Bible Study Team** is a specialized
-                                ministry under the
+                                The{" "}
+                                <span className="bold underline text-orange-600">
+                                    5K Bible Study Team{" "}
+                                </span>
+                                is a specialized ministry under the
                                 <span className="text-[#6A0DAD] font-bold">
                                     {" "}
                                     5 Killo Main Fellowship
                                 </span>
-                                . We are one of Eight core teams dedicated to
-                                spiritual formation.
+                                . We are one of{" "}
+                                <span className="bold underline text-orange-600">
+                                    Eight core teams{" "}
+                                </span>{" "}
+                                dedicated to spiritual formation.
                             </p>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -79,9 +86,11 @@ const AboutSection: React.FC = () => {
                             </div>
                         </div>
 
-                        <button className="bg-gradient-to-r from-[#6A0DAD] to-[#FF6600] text-white px-8 py-3 rounded-xl font-black text-[11px] uppercase tracking-widest shadow-lg transition-all active:scale-95">
-                            Learn More About 5 Killo Fellowship
-                        </button>
+                        <Link href="/About" className="w-full sm:w-auto">
+                            <button className="bg-gradient-to-r from-[#6A0DAD] to-[#FF6600] text-white px-8 py-3 rounded-xl font-black text-[11px] uppercase tracking-widest shadow-lg transition-all active:scale-95 my-3">
+                                Learn More About 5 Killo Fellowship
+                            </button>
+                        </Link>
                     </motion.div>
 
                     {/* Right: Stylized Image - Switched aspect to 16/9 to take less vertical space */}
