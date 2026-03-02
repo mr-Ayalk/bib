@@ -13,28 +13,29 @@ import testimonial4 from "../assets/images/beki.png";
 
 const testimonies = [
     {
-        name: "Olly D.",
-        role: "TNT Trainee",
-        image: testimonial2,
-        text: "The TNT program didn't just teach me leadership; it showed me how to live the Word in my daily campus life. My perspective on service has shifted forever.",
-    },
-    {
-        name: "Ayalkbet T.",
-        role: "Manuscript Member",
-        image: testimonial3,
-        text: "Studying the Bible through the Manuscript method opened my eyes. For the first time, I felt like I was hearing God's voice directly from the text.",
+        name: "Tebarek F. ",
+        role: "BS Team Former 2024/25 Batch Main Leader",
+        image: testimonial1,
+        text: "The BS team is one of the best life experiences I've had. It is my priority and the place where God worked in me. The Manuscript program is one that I loved immensely.",
     },
     {
         name: "Bereket G.",
-        role: "Hermenutics Student",
+        role: "BS Team 2025/26 Batch Main Leader",
         image: testimonial4,
-        text: "I used to struggle with difficult passages. Now, I have the tools to interpret faithfully. This study has been a foundation for my spiritual growth.",
+        text: "As a Bible study team member, I have learned invaluable lessons, and my life has been transformed. Plus, the Scripture Day program was one of the most amazing experiences I have had.",
+    },
+
+    {
+        name: "Olly D.",
+        role: "BS Team Member and Leader",
+        image: testimonial2,
+        text: "As a Bible study team member at 5K Students Fellowship, I have learned a lot—from how to study the Bible to how to apply it in our daily life. Besides the study, the community is amazing! I have developed my communication skills, learned to love and care for others, and so much more.",
     },
     {
-        name: "Tebarek F",
-        role: "Bible Reading Challenge",
-        image: testimonial1,
-        text: "Consistency was my biggest challenge. Being part of this 5K community kept me accountable, and reading through the Word changed my heart.",
+        name: "Ayalkbet T.(Bechu)",
+        role: "BS Team Member and Leader",
+        image: testimonial3,
+        text: "Studying the Bible through the Manuscript method opened my eyes. For the first time, I felt like I was hearing God's voice directly from the text.",
     },
 ];
 

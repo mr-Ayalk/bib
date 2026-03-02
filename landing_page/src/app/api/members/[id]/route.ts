@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
 
-// Define a type for the update payload to avoid 'any'
 interface MemberUpdateData {
     firstName?: string;
     lastName?: string;
@@ -12,7 +13,7 @@ interface MemberUpdateData {
     subCircleNumber?: number;
     favoriteVerse?: string;
     gender?: "MALE" | "FEMALE";
-    image?: string; // or imageUrl depending on your schema
+    image?: string;
 }
 
 export async function PUT(
@@ -23,7 +24,7 @@ export async function PUT(
         const formData = await request.formData();
         const id = params.id;
 
-        // FIX: Replaced 'any' with our typed object
+        // Construct the base data object
         const data: MemberUpdateData = {
             firstName: formData.get("firstName") as string,
             lastName: formData.get("lastName") as string,
@@ -37,10 +38,29 @@ export async function PUT(
             gender: formData.get("gender") as "MALE" | "FEMALE",
         };
 
-        const image = formData.get("image");
-        if (image instanceof File && image.size > 0) {
-            // Your image saving logic here...
-            // data.image = savedUrl;
+        // --- Handle Image Update ---
+        const imageFile = formData.get("image") as File | null;
+
+        // Check if a new file was actually uploaded (not just a string URL)
+        if (imageFile && typeof imageFile !== "string" && imageFile.size > 0) {
+            const buffer = Buffer.from(await imageFile.arrayBuffer());
+
+            const ext = path.extname(imageFile.name);
+            const baseName = path
+                .basename(imageFile.name, ext)
+                .replace(/[^a-z0-9]/gi, "-")
+                .toLowerCase();
+
+            // Collapse multiple hyphens and trim
+            const cleanBase = baseName.replace(/-+/g, "-");
+            const filename = `${Date.now()}-${cleanBase}${ext.toLowerCase()}`;
+            const uploadDir = path.join(process.cwd(), "public", "uploads");
+
+            await mkdir(uploadDir, { recursive: true });
+            await writeFile(path.join(uploadDir, filename), buffer);
+
+            // Add the new image path to the update data
+            data.image = `/uploads/${filename}`;
         }
 
         const updatedMember = await prisma.member.update({
@@ -49,8 +69,29 @@ export async function PUT(
         });
 
         return NextResponse.json(updatedMember);
-    } catch {
-        // FIX: Removed unused 'error' variable
-        return NextResponse.json({ error: "Update failed" }, { status: 500 });
+    } catch (error: unknown) {
+        // Fix: Use the error variable to avoid linting errors
+        const errorMessage =
+            error instanceof Error ? error.message : "Update failed";
+        console.error("Update error details:", errorMessage);
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
+    }
+}
+
+export async function DELETE(
+    request: Request,
+    { params }: { params: { id: string } },
+) {
+    try {
+        await prisma.member.delete({
+            where: { id: params.id },
+        });
+        return NextResponse.json({ message: "Member deleted" });
+    } catch (error: unknown) {
+        // Fix: Use the error variable to avoid linting errors
+        const errorMessage =
+            error instanceof Error ? error.message : "Delete failed";
+        console.error("Delete error details:", errorMessage);
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }

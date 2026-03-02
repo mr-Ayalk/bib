@@ -77,7 +77,7 @@ export async function POST(request: Request) {
 
         // Fixed Lint Error: Create a response object without the password field
         const { password, ...memberResponse } = newMember;
-        console.log(`User ${password ? 'secured' : 'error'}`); // Simple log to use the variable
+        console.log(`User ${password ? "secured" : "error"}`); // Simple log to use the variable
 
         return NextResponse.json(
             { success: true, member: memberResponse },

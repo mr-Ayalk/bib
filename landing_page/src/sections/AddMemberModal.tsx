@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useRef } from "react";
-import { X,  Camera } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { X, Camera } from "lucide-react";
 
 interface Member {
     id?: string;
@@ -11,6 +11,9 @@ interface Member {
     department: string;
     batch: string;
     subCircleNumber: string | number;
+    birthDayMonth?: string;
+    favoriteVerse?: string;
+    image?: string;
 }
 
 interface AddMemberModalProps {
@@ -24,6 +27,7 @@ export default function AddMemberModal({
     isOpen,
     onClose,
     onSuccess,
+    initialData,
 }: AddMemberModalProps) {
     const [formData, setFormData] = useState({
         firstName: "",
@@ -36,10 +40,43 @@ export default function AddMemberModal({
         birthDayMonth: "",
         favoriteVerse: "",
     });
+
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Populate form fields when editing, reset when adding new
+    useEffect(() => {
+        if (initialData && isOpen) {
+            setFormData({
+                firstName: initialData.firstName || "",
+                lastName: initialData.lastName || "",
+                email: initialData.email || "",
+                gender: initialData.gender || "MALE",
+                department: initialData.department || "",
+                batch: initialData.batch || "",
+                subCircleNumber: initialData.subCircleNumber?.toString() || "",
+                birthDayMonth: initialData.birthDayMonth || "",
+                favoriteVerse: initialData.favoriteVerse || "",
+            });
+            setPreviewUrl(initialData.image || null);
+        } else if (isOpen) {
+            setFormData({
+                firstName: "",
+                lastName: "",
+                email: "",
+                gender: "MALE",
+                department: "",
+                batch: "",
+                subCircleNumber: "",
+                birthDayMonth: "",
+                favoriteVerse: "",
+            });
+            setPreviewUrl(null);
+            setImageFile(null);
+        }
+    }, [initialData, isOpen]);
 
     if (!isOpen) return null;
 
@@ -54,17 +91,22 @@ export default function AddMemberModal({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-
         const data = new FormData();
+
         Object.entries(formData).forEach(([key, value]) =>
             data.append(key, value),
         );
         if (imageFile) data.append("image", imageFile);
 
         try {
-            const response = await fetch("/api/members", {
-                method: "POST",
-                body: data, // No Headers! Browser handles multipart boundary
+            const url = initialData
+                ? `/api/members/${initialData.id}`
+                : "/api/members";
+            const method = initialData ? "PUT" : "POST";
+
+            const response = await fetch(url, {
+                method: method,
+                body: data,
             });
 
             if (response.ok) {
@@ -72,26 +114,28 @@ export default function AddMemberModal({
                 onClose();
             } else {
                 const err = await response.json();
-                alert(err.error || "Failed to save");
+                alert(err.error || "Failed to save member");
             }
         } catch (error) {
-            console.error(error);
+            console.error("Submission Error:", error);
+            alert("An error occurred while saving.");
         } finally {
             setIsSubmitting(false);
         }
     };
 
     const inputClasses =
-        "w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-500/20";
+        "w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-500/20 transition-all";
     const labelClasses =
         "block text-[10px] font-black text-slate-500 uppercase mb-1 ml-1";
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#4C0B81]/30 backdrop-blur-sm p-4">
             <div className="bg-white rounded-[2.5rem] w-full max-w-xl shadow-2xl max-h-[95vh] overflow-y-auto">
+                {/* Header */}
                 <div className="sticky top-0 bg-white/80 backdrop-blur-md px-8 py-5 border-b flex justify-between items-center z-10">
                     <h2 className="text-xl font-black text-slate-800">
-                        Add New Member
+                        {initialData ? "Edit Member" : "Add New Member"}
                     </h2>
                     <button
                         onClick={onClose}
@@ -115,7 +159,7 @@ export default function AddMemberModal({
                                     alt="Preview"
                                 />
                             ) : (
-                                <div className="text-slate-400 flex flex-col items-center">
+                                <div className="text-slate-400 flex flex-col items-center text-center p-2">
                                     <Camera size={24} />
                                     <span className="text-[9px] font-black uppercase mt-1">
                                         Add Photo
@@ -132,6 +176,7 @@ export default function AddMemberModal({
                         </div>
                     </div>
 
+                    {/* Name Fields */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className={labelClasses}>First Name</label>
@@ -163,6 +208,7 @@ export default function AddMemberModal({
                         </div>
                     </div>
 
+                    {/* Email and Gender */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className={labelClasses}>Email</label>
@@ -199,6 +245,7 @@ export default function AddMemberModal({
                         </div>
                     </div>
 
+                    {/* Dept, Batch, Circle */}
                     <div className="grid grid-cols-3 gap-4">
                         <div>
                             <label className={labelClasses}>Department</label>
@@ -242,13 +289,14 @@ export default function AddMemberModal({
                         </div>
                     </div>
 
+                    {/* Birthday and Verse */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className={labelClasses}>
                                 Birthday (Day/Month)
                             </label>
                             <input
-                                placeholder="15 Jan"
+                                placeholder="e.g. 15 Jan"
                                 className={inputClasses}
                                 value={formData.birthDayMonth}
                                 onChange={(e) =>
@@ -264,7 +312,7 @@ export default function AddMemberModal({
                                 Favorite Verse
                             </label>
                             <input
-                                placeholder="John 1:1"
+                                placeholder="e.g. John 3:16"
                                 className={inputClasses}
                                 value={formData.favoriteVerse}
                                 onChange={(e) =>
@@ -277,20 +325,25 @@ export default function AddMemberModal({
                         </div>
                     </div>
 
+                    {/* Action Buttons */}
                     <div className="flex gap-4 pt-4">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 py-4 text-xs font-black uppercase text-slate-400 tracking-widest"
+                            className="flex-1 py-4 text-xs font-black uppercase text-slate-400 tracking-widest hover:text-slate-600 transition-colors"
                         >
                             Discard
                         </button>
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex-[2] bg-[#4C0B81] text-white py-4 rounded-[1.2rem] text-xs font-black uppercase tracking-widest shadow-xl shadow-purple-100 disabled:opacity-50"
+                            className="flex-[2] bg-[#4C0B81] text-white py-4 rounded-[1.2rem] text-xs font-black uppercase tracking-widest shadow-xl shadow-purple-100 disabled:opacity-50 hover:bg-[#3a0863] transition-all"
                         >
-                            {isSubmitting ? "Processing..." : "Register Member"}
+                            {isSubmitting
+                                ? "Processing..."
+                                : initialData
+                                  ? "Update Member"
+                                  : "Register Member"}
                         </button>
                     </div>
                 </form>

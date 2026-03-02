@@ -16,7 +16,7 @@ const LEADERS_DATA = [
         title: "Guided by Grace",
         description:
             "Our core leadership team at 5K Bible Study is dedicated to fostering a space where every student can encounter the life-transforming power of the Word.",
-        role: "Core Committee 2025/26",
+        role: "Core Committee 2023/24",
     },
     {
         id: 2,
@@ -32,7 +32,7 @@ const LEADERS_DATA = [
         title: "A Growing Community",
         description:
             "We believe in equipping the next generation of leaders to carry the message of hope from the campus to the world.",
-        role: "Outreach & Vision Team",
+        role: "Program Coordinators",
     },
 ];
 

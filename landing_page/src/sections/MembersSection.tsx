@@ -11,31 +11,32 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { twMerge } from "tailwind-merge";
 
-// Keep your icon imports
+// Icons for default gender profiles
 import Men from "../assets/images/Men_icon.png";
 import Women from "../assets/images/Women_icon.png";
 
 interface Student {
-    firstName: string; // Changed from name
-    lastName: string; // Added
-    department: string; // Changed from dept
-    gender: "MALE" | "FEMALE"; // Match Prisma Enum
-    subCircleNumber: number; // Changed from circle
-    image?: string;
-    batch: string; // Changed from yearBatch
+    firstName: string; // From database [cite: 2, 577]
+    lastName: string; // From database [cite: 2, 578]
+    department: string; // From database [cite: 2, 582]
+    gender: "MALE" | "FEMALE"; // Matches Prisma Enum [cite: 2, 584]
+    subCircleNumber: number; // From database [cite: 3, 585]
+    image?: string; // Profile image path [cite: 588]
+    batch: string; // Grouping field [cite: 3, 583]
 }
 
 const Members: React.FC = () => {
-    const [openYear, setOpenYear] = useState<string | null>("2nd Year");
+    const [openYear, setOpenYear] = useState<string | null>(null);
     const [memberData, setMemberData] = useState<Record<string, Student[]>>({});
     const [loading, setLoading] = useState(true);
+
     useEffect(() => {
         const fetchMembers = async () => {
             try {
                 const response = await fetch("/api/members");
                 const data: Student[] = await response.json();
 
-                // Use 'batch' instead of 'yearBatch'
+                // Group students by their batch year
                 const grouped = data.reduce(
                     (acc: Record<string, Student[]>, student) => {
                         const year = student.batch || "Unknown Batch";
@@ -47,6 +48,10 @@ const Members: React.FC = () => {
                 );
 
                 setMemberData(grouped);
+
+                // Open the first available year by default
+                const years = Object.keys(grouped);
+                if (years.length > 0) setOpenYear(years[0]);
             } catch (error) {
                 console.error("Error fetching members:", error);
             } finally {
@@ -156,7 +161,18 @@ const Members: React.FC = () => {
                                                     .map((student, idx) => (
                                                         <motion.div
                                                             key={idx}
-                                                            // ... keep your existing motion props
+                                                            initial={{
+                                                                x: -20,
+                                                                opacity: 0,
+                                                            }}
+                                                            animate={{
+                                                                x: 0,
+                                                                opacity: 1,
+                                                            }}
+                                                            transition={{
+                                                                delay:
+                                                                    idx * 0.05,
+                                                            }}
                                                             className="grid grid-cols-12 gap-4 p-4 rounded-xl bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-transparent hover:border-[#6A0DAD]/30 transition-all items-center group"
                                                         >
                                                             <div className="col-span-1 font-black text-gray-400 group-hover:text-orange-500 transition-colors">
@@ -167,20 +183,25 @@ const Members: React.FC = () => {
                                                                 <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-slate-200 dark:border-white/10 group-hover:border-[#6A0DAD] transition-all">
                                                                     <Image
                                                                         src={
-                                                                            student.image || // Use the new field name
-                                                                            (student.gender ===
-                                                                            "MALE"
-                                                                                ? Men
-                                                                                : Women)
+                                                                            student.image
+                                                                                ? student.image.startsWith(
+                                                                                      "/",
+                                                                                  )
+                                                                                    ? student.image
+                                                                                    : `/${student.image}`
+                                                                                : student.gender ===
+                                                                                    "MALE"
+                                                                                  ? Men
+                                                                                  : Women
                                                                         }
                                                                         alt={`${student.firstName} ${student.lastName}`}
                                                                         fill
-                                                                        sizes="40px" // Good practice for performance
+                                                                        unoptimized // This prop was added to fix the issue
+                                                                        sizes="40px"
                                                                         className="object-cover"
                                                                     />
                                                                 </div>
                                                                 <span className="font-bold text-gray-800 dark:text-gray-200 truncate">
-                                                                    {/* FIXED: Using firstName and lastName */}
                                                                     {
                                                                         student.firstName
                                                                     }{" "}
@@ -191,7 +212,6 @@ const Members: React.FC = () => {
                                                             </div>
 
                                                             <div className="col-span-3 text-sm font-medium text-gray-600 dark:text-gray-400">
-                                                                {/* FIXED: Using department */}
                                                                 {
                                                                     student.department
                                                                 }
@@ -201,7 +221,6 @@ const Members: React.FC = () => {
                                                                 <span
                                                                     className={twMerge(
                                                                         "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter",
-                                                                        /* FIXED: Matching "MALE" Enum */
                                                                         student.gender ===
                                                                             "MALE"
                                                                             ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
@@ -217,7 +236,7 @@ const Members: React.FC = () => {
 
                                                             <div className="col-span-2 text-center">
                                                                 <span className="bg-slate-100 dark:bg-white/5 text-gray-800 dark:text-white px-4 py-1.5 rounded-lg font-black text-sm border border-gray-200 dark:border-white/10 group-hover:border-orange-500/50 transition-colors">
-                                                                    {/* FIXED: Using subCircleNumber */}
+                                                                    Circle{" "}
                                                                     {
                                                                         student.subCircleNumber
                                                                     }
