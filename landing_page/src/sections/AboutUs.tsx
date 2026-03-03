@@ -87,7 +87,7 @@ const AboutSection: React.FC = () => {
                         </div>
 
                         <Link href="/About" className="w-full sm:w-auto">
-                            <button className="bg-gradient-to-r from-[#6A0DAD]  text-white px-8 py-3 rounded-xl font-black text-[11px] uppercase tracking-widest shadow-lg transition-all active:scale-95 my-3">
+                            <button className="bg-[#6A0DAD]  text-white px-8 py-3 rounded-xl font-black text-[11px] uppercase tracking-widest shadow-lg transition-all active:scale-95 my-3">
                                 Learn More About 5 Killo Fellowship
                             </button>
                         </Link>
