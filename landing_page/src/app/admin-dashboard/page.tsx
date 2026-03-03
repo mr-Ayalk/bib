@@ -37,6 +37,8 @@ interface Member {
     firstName: string;
     lastName: string;
     email: string;
+    mobileNumber?: string;    // Added
+    telegramUsername?: string; // Added
     gender: "MALE" | "FEMALE";
     department: string;
     batch: string;

@@ -23,20 +23,21 @@ model Member {
   firstName         String
   lastName          String
   username          String   @unique
-  password          String   // In a real app, hash this!
+  password          String   
   email             String   @unique
-  birthDayMonth     String   // e.g., "October 12"
-  image             String?  // URL to image
+  // New fields added below
+  mobileNumber      String?  
+  telegramUsername  String?  
+  birthDayMonth     String   
+  image             String?  
   department        String
   favoriteVerse     String
   role              Role     @default(USER)
   gender            Gender
-  batch             String   // Year of study
+  batch             String   
   subCircleNumber   Int
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-
-  // Relations
   attendances       Attendance[]
 }
 

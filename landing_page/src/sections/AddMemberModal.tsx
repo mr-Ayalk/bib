@@ -7,6 +7,8 @@ interface Member {
     firstName: string;
     lastName: string;
     email: string;
+    mobileNumber?: string; // Added
+    telegramUsername?: string; // Added
     gender: "MALE" | "FEMALE";
     department: string;
     batch: string;
@@ -33,6 +35,8 @@ export default function AddMemberModal({
         firstName: "",
         lastName: "",
         email: "",
+        mobileNumber: "", // Added
+        telegramUsername: "", // Added
         gender: "MALE",
         department: "",
         batch: "",
@@ -46,13 +50,14 @@ export default function AddMemberModal({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Populate form fields when editing, reset when adding new
     useEffect(() => {
         if (initialData && isOpen) {
             setFormData({
                 firstName: initialData.firstName || "",
                 lastName: initialData.lastName || "",
                 email: initialData.email || "",
+                mobileNumber: initialData.mobileNumber || "", // Added
+                telegramUsername: initialData.telegramUsername || "", // Added
                 gender: initialData.gender || "MALE",
                 department: initialData.department || "",
                 batch: initialData.batch || "",
@@ -66,6 +71,8 @@ export default function AddMemberModal({
                 firstName: "",
                 lastName: "",
                 email: "",
+                mobileNumber: "", // Added
+                telegramUsername: "", // Added
                 gender: "MALE",
                 department: "",
                 batch: "",
@@ -208,10 +215,55 @@ export default function AddMemberModal({
                         </div>
                     </div>
 
+                    {/* NEW: Contact Fields (Mobile and Telegram) */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className={labelClasses}>
+                                Mobile Number
+                            </label>
+                            <input
+                                type="tel"
+                                placeholder="+251..."
+                                className={inputClasses}
+                                value={formData.mobileNumber}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        mobileNumber: e.target.value,
+                                    })
+                                }
+                            />
+                        </div>
+                        <div>
+                            <label className={labelClasses}>
+                                Telegram Username
+                            </label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
+                                    @
+                                </span>
+                                <input
+                                    type="text"
+                                    placeholder="username"
+                                    className={`${inputClasses} pl-7`}
+                                    value={formData.telegramUsername}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            telegramUsername: e.target.value,
+                                        })
+                                    }
+                                />
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Email and Gender */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className={labelClasses}>Email</label>
+                            <label className={labelClasses}>
+                                Email Address
+                            </label>
                             <input
                                 required
                                 type="email"

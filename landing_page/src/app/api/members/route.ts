@@ -41,7 +41,9 @@ export async function POST(request: Request) {
         const birthDayMonth = formData.get("birthDayMonth") as string;
         const favoriteVerse = formData.get("favoriteVerse") as string;
         const imageFile = formData.get("image") as File | null;
-
+        // Inside POST function
+        const mobileNumber = formData.get("mobileNumber") as string;
+        const telegramUsername = formData.get("telegramUsername") as string;
         if (!firstName || !lastName || !email || !gender) {
             return NextResponse.json(
                 { error: "Missing required fields" },
@@ -89,6 +91,8 @@ export async function POST(request: Request) {
                 department,
                 batch,
                 gender,
+                mobileNumber,
+        telegramUsername,
                 subCircleNumber: parseInt(subCircleNumber) || 0,
                 birthDayMonth: birthDayMonth || "Not Provided",
                 favoriteVerse: favoriteVerse || "To be updated",

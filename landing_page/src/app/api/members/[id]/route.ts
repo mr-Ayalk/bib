@@ -21,6 +21,8 @@ interface MemberUpdateData {
     favoriteVerse: string;
     gender: "MALE" | "FEMALE";
     image?: string; // Optional field for the Cloudinary URL
+    mobileNumber?: string;
+    telegramUsername?: string;
 }
 
 export async function PUT(
@@ -42,6 +44,8 @@ export async function PUT(
                 parseInt(formData.get("subCircleNumber") as string) || 0,
             favoriteVerse: formData.get("favoriteVerse") as string,
             gender: formData.get("gender") as "MALE" | "FEMALE",
+            mobileNumber: formData.get("mobileNumber") as string,
+            telegramUsername: formData.get("telegramUsername") as string,
         };
 
         const imageFile = formData.get("image") as File | null;
