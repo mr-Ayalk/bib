@@ -1,26 +1,36 @@
 export const dynamic = "force-dynamic";
-
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
 
+// Cloudinary Configuration
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// GET handler to fetch all members for the dashboard
 export async function GET() {
     try {
         const members = await prisma.member.findMany({
-            orderBy: { firstName: "asc" },
+            orderBy: { createdAt: "desc" },
         });
         return NextResponse.json(members);
-    } catch {
-        return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
+    } catch (error) {
+        // Fix: Log the error to satisfy 'defined but never used' or use _error
+        console.error("Fetch members error:", error);
+        return NextResponse.json(
+            { error: "Failed to fetch members" },
+            { status: 500 },
+        );
     }
 }
 
 export async function POST(request: Request) {
     try {
         const formData = await request.formData();
-
         const firstName = formData.get("firstName") as string;
         const lastName = formData.get("lastName") as string;
         const email = formData.get("email") as string;
@@ -39,19 +49,31 @@ export async function POST(request: Request) {
             );
         }
 
-        let imageUrl = null;
-        if (imageFile && imageFile.size > 0) {
-            const buffer = Buffer.from(await imageFile.arrayBuffer());
-            const filename = `${Date.now()}-${imageFile.name.replace(/\s+/g, "-")}`;
-            const uploadDir = path.join(process.cwd(), "public", "uploads");
+        let imageUrl: string | null = null;
 
-            try {
-                await mkdir(uploadDir, { recursive: true });
-                await writeFile(path.join(uploadDir, filename), buffer);
-                imageUrl = `/uploads/${filename}`;
-            } catch (err) {
-                console.error("Local Save Error:", err);
-            }
+        if (imageFile && imageFile.size > 0) {
+            const arrayBuffer = await imageFile.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            // Fix: Replaced 'any' with 'UploadApiResponse'
+            const uploadResponse = await new Promise<UploadApiResponse>(
+                (resolve, reject) => {
+                    cloudinary.uploader
+                        .upload_stream(
+                            { folder: "member_uploads" },
+                            (error, result) => {
+                                if (error) reject(error);
+                                else if (result) resolve(result);
+                                else
+                                    reject(
+                                        new Error("Cloudinary upload failed"),
+                                    );
+                            },
+                        )
+                        .end(buffer);
+                },
+            );
+            imageUrl = uploadResponse.secure_url;
         }
 
         const generatedUsername = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(100 + Math.random() * 900)}`;
@@ -75,15 +97,18 @@ export async function POST(request: Request) {
             },
         });
 
-        // Fixed Lint Error: Create a response object without the password field
+        // Remove password from response for security
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { password, ...memberResponse } = newMember;
-        console.log(`User ${password ? "secured" : "error"}`); // Simple log to use the variable
 
         return NextResponse.json(
             { success: true, member: memberResponse },
             { status: 201 },
         );
     } catch (error: unknown) {
+        // Fix: Handle 'error' type safely without 'any'
+        console.error("Submission error:", error);
+
         if (
             error &&
             typeof error === "object" &&
@@ -91,10 +116,11 @@ export async function POST(request: Request) {
             (error as { code: string }).code === "P2002"
         ) {
             return NextResponse.json(
-                { error: "Email or username already exists." },
+                { error: "Email already exists." },
                 { status: 400 },
             );
         }
+
         return NextResponse.json(
             { error: "Internal Server Error" },
             { status: 500 },

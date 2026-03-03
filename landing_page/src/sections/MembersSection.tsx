@@ -183,22 +183,44 @@ const Members: React.FC = () => {
                                                                 <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-slate-200 dark:border-white/10 group-hover:border-[#6A0DAD] transition-all">
                                                                     <Image
                                                                         src={
-                                                                            student.image
-                                                                                ? student.image.startsWith(
-                                                                                      "/",
-                                                                                  )
-                                                                                    ? student.image
-                                                                                    : `/${student.image}`
-                                                                                : student.gender ===
-                                                                                    "MALE"
-                                                                                  ? Men
-                                                                                  : Women
+                                                                            student.image &&
+                                                                            student.image.includes(
+                                                                                "http",
+                                                                            )
+                                                                                ? student.image // Use Cloudinary URL directly
+                                                                                : student.image
+                                                                                  ? student.image.startsWith(
+                                                                                        "/",
+                                                                                    )
+                                                                                      ? student.image
+                                                                                      : `/${student.image}` // Handle legacy local paths
+                                                                                  : student.gender ===
+                                                                                      "MALE"
+                                                                                    ? Men
+                                                                                    : Women // Default icons
                                                                         }
                                                                         alt={`${student.firstName} ${student.lastName}`}
                                                                         fill
-                                                                        unoptimized // This prop was added to fix the issue
+                                                                        unoptimized
                                                                         sizes="40px"
                                                                         className="object-cover"
+                                                                        // Fallback for broken links
+                                                                        onError={(
+                                                                            e,
+                                                                        ) => {
+                                                                            const target =
+                                                                                e.target as HTMLImageElement;
+                                                                            if (
+                                                                                student.gender ===
+                                                                                "MALE"
+                                                                            ) {
+                                                                                target.src =
+                                                                                    Men.src;
+                                                                            } else {
+                                                                                target.src =
+                                                                                    Women.src;
+                                                                            }
+                                                                        }}
                                                                     />
                                                                 </div>
                                                                 <span className="font-bold text-gray-800 dark:text-gray-200 truncate">

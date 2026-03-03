@@ -1,19 +1,26 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
 
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Interface for the update data object to avoid 'any'
 interface MemberUpdateData {
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    birthDayMonth?: string;
-    department?: string;
-    batch?: string;
-    subCircleNumber?: number;
-    favoriteVerse?: string;
-    gender?: "MALE" | "FEMALE";
-    image?: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    birthDayMonth: string;
+    department: string;
+    batch: string;
+    subCircleNumber: number;
+    favoriteVerse: string;
+    gender: "MALE" | "FEMALE";
+    image?: string; // Optional field for the Cloudinary URL
 }
 
 export async function PUT(
@@ -24,7 +31,6 @@ export async function PUT(
         const formData = await request.formData();
         const id = params.id;
 
-        // Construct the base data object
         const data: MemberUpdateData = {
             firstName: formData.get("firstName") as string,
             lastName: formData.get("lastName") as string,
@@ -38,29 +44,33 @@ export async function PUT(
             gender: formData.get("gender") as "MALE" | "FEMALE",
         };
 
-        // --- Handle Image Update ---
         const imageFile = formData.get("image") as File | null;
 
-        // Check if a new file was actually uploaded (not just a string URL)
+        // Using Cloudinary for Update/Edit
         if (imageFile && typeof imageFile !== "string" && imageFile.size > 0) {
-            const buffer = Buffer.from(await imageFile.arrayBuffer());
+            const arrayBuffer = await imageFile.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
 
-            const ext = path.extname(imageFile.name);
-            const baseName = path
-                .basename(imageFile.name, ext)
-                .replace(/[^a-z0-9]/gi, "-")
-                .toLowerCase();
+            // Use UploadApiResponse instead of 'any'
+            const uploadResponse = await new Promise<UploadApiResponse>(
+                (resolve, reject) => {
+                    cloudinary.uploader
+                        .upload_stream(
+                            { folder: "member_uploads" },
+                            (error, result) => {
+                                if (error) reject(error);
+                                else if (result) resolve(result);
+                                else
+                                    reject(
+                                        new Error("Cloudinary upload failed"),
+                                    );
+                            },
+                        )
+                        .end(buffer);
+                },
+            );
 
-            // Collapse multiple hyphens and trim
-            const cleanBase = baseName.replace(/-+/g, "-");
-            const filename = `${Date.now()}-${cleanBase}${ext.toLowerCase()}`;
-            const uploadDir = path.join(process.cwd(), "public", "uploads");
-
-            await mkdir(uploadDir, { recursive: true });
-            await writeFile(path.join(uploadDir, filename), buffer);
-
-            // Add the new image path to the update data
-            data.image = `/uploads/${filename}`;
+            data.image = uploadResponse.secure_url;
         }
 
         const updatedMember = await prisma.member.update({
@@ -70,28 +80,23 @@ export async function PUT(
 
         return NextResponse.json(updatedMember);
     } catch (error: unknown) {
-        // Fix: Use the error variable to avoid linting errors
         const errorMessage =
-            error instanceof Error ? error.message : "Update failed";
-        console.error("Update error details:", errorMessage);
+            error instanceof Error ? error.message : "Internal Server Error";
+        console.error("Update error:", errorMessage);
         return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
 
 export async function DELETE(
-    request: Request,
+    _request: Request, // Prefixed with _ to show it is intentionally unused
     { params }: { params: { id: string } },
 ) {
     try {
-        await prisma.member.delete({
-            where: { id: params.id },
-        });
+        await prisma.member.delete({ where: { id: params.id } });
         return NextResponse.json({ message: "Member deleted" });
     } catch (error: unknown) {
-        // Fix: Use the error variable to avoid linting errors
         const errorMessage =
-            error instanceof Error ? error.message : "Delete failed";
-        console.error("Delete error details:", errorMessage);
+            error instanceof Error ? error.message : "Internal Server Error";
         return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
