@@ -3,12 +3,13 @@ import React from "react";
 import {
     FileText,
     Download,
-    ExternalLink,
+    // ExternalLink,
     Calendar,
     BookOpen,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Tag from "@/components/Tag"; // Ensure the path is correct
+import Link from "next/link";
 
 const mainArticle = {
     title: "ቅድስና፦ ከእግዚአብሔር፣ በእግዚአብሔር፣ ለእግዚአብሔር",
@@ -28,6 +29,7 @@ const otherResources = [
         date: "Jan 12, 2026",
         fileUrl: "/materials/psalms_of_asaph.pdf",
         fileName: "psalms_of_asaph.pdf",
+        href: "/Psalms_of_Asaph",
     },
     {
         title: "IBS Guide for 5K",
@@ -36,26 +38,28 @@ const otherResources = [
         date: "Nov 18, 2025",
         fileUrl: "/materials/ibs_guide_5k.pdf",
         fileName: "IBS_GUIDE_5K.pdf",
+        href: "/Ibs",
     },
     {
-        title: "Discipleship Foundations",
+        title: "The Book of Ruth: A Journey of Redemption",
         description:
-            "Mastering the basics of following Jesus: prayer, word, and consistent fellowship.",
+            "An insightful study guide on the Book of Ruth, exploring themes of loyalty, providence, and redemption.2025/26 First Semester Manuscript Program.",
         date: "Dec 05, 2025",
-        fileUrl: "/materials/ibs_guide_5k.pdf",
-        fileName: "IBS_GUIDE_5K.pdf",
+        fileUrl: "/materials/RUTH.pdf",
+        fileName: "RUTH.pdf",
+        href: "/Ruth",
     },
 ];
 
 const MaterialsSection: React.FC = () => {
-    const handleView = (url: string, isPPT: boolean) => {
-        if (isPPT) {
-            const viewerUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(window.location.origin + url)}`;
-            window.open(viewerUrl, "_blank");
-        } else {
-            window.open(url, "_blank");
-        }
-    };
+    // const handleView = (url: string, isPPT: boolean) => {
+    //     if (isPPT) {
+    //         const viewerUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(window.location.origin + url)}`;
+    //         window.open(viewerUrl, "_blank");
+    //     } else {
+    //         window.open(url, "_blank");
+    //     }
+    // };
 
     const handleDownload = (url: string, name: string) => {
         const link = document.createElement("a");
@@ -109,14 +113,18 @@ const MaterialsSection: React.FC = () => {
                         </p>
 
                         <div className="flex flex-wrap justify-center gap-4">
-                            <button
-                                onClick={() =>
-                                    handleView(mainArticle.fileUrl, false)
-                                }
-                                className="flex items-center gap-2 bg-[#6A0DAD] hover:bg-[#5a0bb4] text-white px-8 py-4 rounded-xl font-bold text-sm transition-all active:scale-95 shadow-lg shadow-purple-500/10"
-                            >
-                                <ExternalLink size={16} /> Open Article
-                            </button>
+                            <Link href="/HolinessArticle" target="_blank">
+                                {" "}
+                                <button
+                                    // onClick={() =>
+                                    //     handleView(mainArticle.fileUrl, false)
+                                    // }
+                                    className="flex items-center gap-2 bg-[#6A0DAD] hover:bg-[#5a0bb4] text-white px-8 py-4 rounded-xl font-bold text-sm transition-all active:scale-95 shadow-lg shadow-purple-500/10"
+                                >
+                                    {/* <ExternalLink size={16} /> Open Article */}
+                                    Open Article
+                                </button>
+                            </Link>
                             <button
                                 onClick={() =>
                                     handleDownload(
@@ -160,14 +168,18 @@ const MaterialsSection: React.FC = () => {
                             </p>
 
                             <div className="mt-auto flex w-full gap-3">
-                                <button
-                                    onClick={() =>
-                                        handleView(res.fileUrl, false)
-                                    }
-                                    className="flex-1 bg-gray-50 dark:bg-white/5 hover:bg-[#6A0DAD] hover:text-white text-gray-900 dark:text-gray-300 py-3 rounded-xl text-[11px] font-bold transition-all uppercase tracking-widest border border-transparent"
-                                >
-                                    View
-                                </button>
+                                <Link href={res.href} target="_blank">
+                                    {" "}
+                                    <button
+                                        // onClick={() =>
+                                        //     handleView(res.fileUrl, false)
+                                        // }
+                                        className="flex-1 bg-gray-50 dark:bg-white/5 hover:bg-[#6A0DAD] hover:text-white text-gray-900 dark:text-gray-300 py-3 rounded-xl text-[11px] font-bold transition-all uppercase tracking-widest border border-transparent"
+                                    >
+                                        View
+                                    </button>
+                                </Link>
+
                                 <button
                                     onClick={() =>
                                         handleDownload(
