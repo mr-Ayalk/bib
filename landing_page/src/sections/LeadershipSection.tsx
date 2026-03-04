@@ -29,7 +29,7 @@ const currentLeaders: Leader[] = [
         name: "Bereket Getachew",
         dept: "Electrical Engineering",
         role: "BS team Main Leader",
-        verse: "Romans 5:6",
+        verse: "Romans 5:6-7",
         image: bekiImg,
     },
     {
@@ -59,21 +59,21 @@ const formerLeaders: Leader[] = [
     {
         name: "Tebarek Fikiru",
         dept: "Civil Engineering",
-        role: "BS team Main Leader",
+        role: "BS team Former Main Leader",
         verse: "Philippians 4:13",
         image: tebeImg,
     },
     {
         name: "Chombe Eliyas",
         dept: "Chemistry",
-        role: "BS team Leader",
+        role: "BS team Former Main Leader",
         verse: "Proverbs 3:5-6",
         image: choImg,
     },
     {
         name: "Nahom Taye",
         dept: "Civil Engineering",
-        role: "BS team Leader",
+        role: "General Fellow Main Leader &BS team Leader",
         verse: "Joshua 1:9",
         image: nahiImg,
     },

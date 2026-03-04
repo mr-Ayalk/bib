@@ -41,9 +41,9 @@ const otherResources = [
         href: "/Ibs",
     },
     {
-        title: "The Book of Ruth: A Journey of Redemption",
+        title: "The Book of Ruth: Under the Wings of God.",
         description:
-            "An insightful study guide on the Book of Ruth, exploring themes of loyalty, providence, and redemption.2025/26 First Semester Manuscript Program.",
+            "2025/26 First Semester Manuscript Program.An insightful study guide on the Book of Ruth, exploring themes of loyalty, providence, and redemption.",
         date: "Dec 05, 2025",
         fileUrl: "/materials/RUTH.pdf",
         fileName: "RUTH.pdf",
