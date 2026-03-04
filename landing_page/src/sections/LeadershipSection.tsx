@@ -4,7 +4,7 @@ import Image, { StaticImageData } from "next/image";
 import { Quote } from "lucide-react";
 
 // Import your images here
-import bekiImg from "../assets/images/beki.jpg";
+import bekiImg from "../assets/images/bekeret.jpg";
 import AyalkImg from "../assets/images/ayalk.jpg";
 import febImg from "../assets/images/Feben Getachew(1).webp";
 import oliImg from "../assets/images/Olly.jpg";
@@ -29,14 +29,14 @@ const currentLeaders: Leader[] = [
         name: "Bereket Getachew",
         dept: "Electrical Engineering",
         role: "BS team Main Leader",
-        verse: "Psalm 119:105",
+        verse: "Romans 5:6",
         image: bekiImg,
     },
     {
         name: "Feven Getachew",
         dept: "Software Engineering",
         role: "General Fellow Main Leader & BS Link",
-        verse: "Romans 8:28",
+        verse: "Psalm 119:105",
         image: febImg, // Replace with actual image
     },
     {
