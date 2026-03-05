@@ -23,7 +23,7 @@ const mainArticle = {
 
 const otherResources = [
     {
-        title: "Psalms of Asaph",
+        title: "Psalms of Asaph-By Biniyam Teketel",
         description:
             "A comprehensive study guide on worship, justice, and God's sovereignty through the lens of Asaph.",
         date: "Jan 12, 2026",

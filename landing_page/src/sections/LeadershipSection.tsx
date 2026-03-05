@@ -4,7 +4,7 @@ import Image, { StaticImageData } from "next/image";
 import { Quote } from "lucide-react";
 
 // Import your images here
-import bekiImg from "../assets/images/bekeret.jpg";
+import bekiImg from "../assets/images/bekka.png";
 import AyalkImg from "../assets/images/ayalk.jpg";
 import febImg from "../assets/images/Feben Getachew(1).webp";
 import oliImg from "../assets/images/Olly.jpg";
