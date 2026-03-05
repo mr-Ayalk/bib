@@ -10,7 +10,7 @@ import testimonial1 from "../assets/images/tebe.png";
 import testimonial2 from "../assets/images/Olly.jpg";
 import testimonial3 from "../assets/images/ayalk.jpg";
 import testimonial4 from "../assets/images/beki.png";
-
+import testimonial5 from "../assets/images/Feben Getachew(1).webp";
 const testimonies = [
     {
         name: "Tebarek F. ",
@@ -36,6 +36,12 @@ const testimonies = [
         role: "BS Team Member and Leader",
         image: testimonial3,
         text: "Studying the Bible through the Manuscript method opened my eyes. For the first time, I felt like I was hearing God's voice directly from the text.",
+    },
+    {
+        name: "Feben Getachew",
+        role: "General Fellow Main Leader & BS Leader Link ",
+        image: testimonial5,
+        text: "BS Team is my place to sit at Jesus’ feet and hear His voice. It’s where I first learned the IBS method and it was amazing to study the Bible both individually and in a group. I feel blessed and honored to serve on this team.",
     },
 ];
 
