@@ -300,7 +300,7 @@ export default function LoginPage() {
                                     <p className="text-sm font-bold text-orange-800 dark:text-orange-300">
                                         Check the joining instructions in the{" "}
                                         <Link
-                                            href="/FAQ"
+                                            href="/"
                                             className="underline decoration-2 underline-offset-4"
                                         >
                                             FAQ section
